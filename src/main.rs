@@ -1,7 +1,11 @@
+#[macro_use] extern crate lalrpop_util;
 extern crate clap;
+extern crate regex;
 
 use std::fs::File;
 use std::io::Read;
+
+mod syntax;
 
 fn main() {
 
@@ -20,6 +24,7 @@ fn main() {
     let mut input = String::new();
     input_file.read_to_string(&mut input).expect("Failed to read file");
 
-    println!("{}", input);
+    let ast = syntax::Parser::new(&input).parse();
+	println!("{:#?}", ast);
 
 }

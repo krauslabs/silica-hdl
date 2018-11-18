@@ -1,0 +1,59 @@
+use syntax::ast::*;
+
+grammar;
+
+pub TopMod: Box<Mod> = {
+    "top" <module:Mod> => <>,
+};
+
+Mod: Box<Mod> = {
+    "mod" <id:Ident> "(" <ports:Ports> ")" "{" <stmts:Stmt*> "}" => Box::new(Mod{ id: id, ports: ports, stmts: stmts }),
+};
+
+Ports: Vec<Box<Port>> = Comma<Port>;
+
+Port: Box<Port> = {
+    "in" <id:Ident> ":" <ty:Type> => Box::new(Port{ dir: PortDir::Input, id: id, ty: ty }),
+    "out" <id:Ident> ":" <ty:Type> => Box::new(Port{ dir: PortDir::Output, id: id, ty: ty }),
+};
+
+Stmt: Box<Stmt> = {
+    <id:Ident> "=" <ex:Expr> ";" => Box::new(Stmt{ kind: StmtKind::Assign(AssignStmt{ id: id, expr: ex })}),
+};
+
+Expr: Box<Expr> = {
+    <l:Expr> "&" <r:Term> => Box::new(Expr{kind: ExprKind::Binary(BinaryExpr{ op: BinaryOp::BitAnd, ex1: l, ex2: r }) }),
+    <l:Expr> "|" <r:Term> => Box::new(Expr{kind: ExprKind::Binary(BinaryExpr{ op: BinaryOp::BitOr, ex1: l, ex2: r }) }),
+    Term,
+};
+
+Term: Box<Expr> = {
+    "(" <Expr> ")" => <>,
+    <Ident> => Box::new(Expr{ kind: ExprKind::Ident(<>) }),
+    <Litrl> => Box::new(Expr{ kind: ExprKind::Litrl(<>) }),
+};
+
+Type: Type = {
+    "bool" => Type::Bool,
+}
+
+Ident: Ident = {
+    r"[a-zA-Z][0-9A-Za-z_]*" => Ident{ val: <>.to_string() },
+};
+
+Litrl: Litrl = {
+    r"[0-9]+" => Litrl{ val: <>.to_string() },
+};
+
+// generic helper macros
+
+Comma<T>: Vec<T> = {
+    <v:(<T> ",")*> <e:T?> => match e {
+        None => v,
+        Some(e) => {
+            let mut v = v;
+            v.push(e);
+            v
+        }
+    }
+};
