@@ -1,76 +1,76 @@
 
-#[derive(Debug)]
+#[derive(Clone, Debug)]
 pub struct Mod {
 	pub id: Ident,
 	pub ports: Vec<Box<Port>>,
 	pub stmts: Vec<Box<Stmt>>,
 }
 
-#[derive(Debug)]
+#[derive(Clone, Debug)]
 pub struct Port {
 	pub dir: PortDir,
 	pub id: Ident,
 	pub ty: Type,
 }
 
-#[derive(Debug)]
+#[derive(Clone, Debug)]
 pub enum PortDir {
 	Input,
 	Output,
 }
 
-#[derive(Debug)]
+#[derive(Clone, Debug)]
 pub enum Type {
 	Bool,
 }
 
-#[derive(Debug)]
+#[derive(Clone, Debug)]
 pub struct Stmt {
 	pub kind: StmtKind,
 }
 
-#[derive(Debug)]
+#[derive(Clone, Debug)]
 pub enum StmtKind {
 	Assign(AssignStmt),
 }
 
-#[derive(Debug)]
+#[derive(Clone, Debug)]
 pub struct AssignStmt {
 	pub id: Ident,
 	pub expr: Box<Expr>,
 }
 
-#[derive(Debug)]
+#[derive(Clone, Debug)]
 pub struct Expr {
 	pub kind: ExprKind,
 }
 
-#[derive(Debug)]
+#[derive(Clone, Debug)]
 pub enum ExprKind {
 	Binary(BinaryExpr),
 	Ident(Ident),
 	Litrl(Litrl),
 }
 
-#[derive(Debug)]
+#[derive(Clone, Debug)]
 pub struct BinaryExpr {
 	pub op: BinaryOp,
 	pub ex1: Box<Expr>,
 	pub ex2: Box<Expr>,
 }
 
-#[derive(Debug)]
+#[derive(Clone, Debug)]
 pub enum BinaryOp {
 	BitAnd,
 	BitOr,
 }
 
-#[derive(Debug)]
+#[derive(Clone, Debug)]
 pub struct Ident {
 	pub val: String,
 }
 
-#[derive(Debug)]
+#[derive(Clone, Debug)]
 pub struct Litrl {
 	pub val: String,
 }

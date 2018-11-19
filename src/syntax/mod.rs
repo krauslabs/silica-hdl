@@ -1,4 +1,4 @@
-mod ast;
+pub mod ast;
 lalrpop_mod!(grammar);
 
 use self::ast::Mod;
