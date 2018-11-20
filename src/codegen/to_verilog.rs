@@ -7,16 +7,24 @@ pub trait ToVerilog {
 
 impl ToVerilog for ast::Mod {
     fn to_verilog(&self, _codegen: &CodeGen) -> String {
-        let mut output;
 
-        output = format!("module {} ( \n", self.id.to_verilog(_codegen));
-        for port in self.ports.iter() {
-            output.push_str(&format!("\t{}, \n", port.to_verilog(_codegen)));
+        let mut output = format!("module {} ( \n", self.id.to_verilog(_codegen));
+
+        let port_len = self.ports.len();
+        for (idx, port) in self.ports.iter().enumerate() {
+            if idx == (port_len - 1) {
+                output.push_str(&format!("\t{} \n", port.to_verilog(_codegen)));
+            } else {
+                output.push_str(&format!("\t{}, \n", port.to_verilog(_codegen)));
+            }
         }
+
         output.push_str("); \n");
+
         for stmt in self.stmts.iter() {
             output.push_str(&format!("\t{} \n", stmt.to_verilog(_codegen)));
         }
+
         output.push_str("endmodule \n");
 
         output
