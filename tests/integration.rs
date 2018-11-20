@@ -1,11 +1,22 @@
 use std::fs::File;
-use std::io::Read;
+use std::io::BufReader;
+use std::io::BufRead;
 use std::process::Command;
 
 #[test]
 fn and_gate() {
 
-    Command::new("./target/debug/silicac")
+    let mut expected = String::new();
+    let mut generated = String::new();
+
+    let file = File::open("./tests/resources/and_gate/and_gate.v")
+        .expect("Input file not found.");
+    let file = BufReader::new(&file);
+    for line in file.lines() {
+        expected.push_str(line.unwrap().trim());
+    }
+
+    Command::new("./target/debug/silica")
         .arg("-i")
         .arg("./tests/resources/and_gate/and_gate.si")
         .arg("-o")
@@ -13,17 +24,15 @@ fn and_gate() {
         .output()
         .expect("Failed to execute process.");
 
-    let mut expected_file = File::open("./tests/resources/and_gate/and_gate.v")
-        .expect("Input file not found.");
-    let mut expected_verilog = String::new();
-    expected_file.read_to_string(&mut expected_verilog)
-        .expect("Unable to read the file.");
+    let file = File::open("./tests/resources/and_gate/generated_and_gate.v")
+        .expect("Generated file not found.");
+    let file = BufReader::new(&file);
+    for line in file.lines() {
+        generated.push_str(line.unwrap().trim());
+    }
 
-    let mut generated_file = File::open("./tests/resources/and_gate/generated_and_gate.v")
-        .expect("Output file not found.");
-    let mut generated_verilog = String::new();
-    generated_file.read_to_string(&mut generated_verilog)
-        .expect("Unable to read the file.");
+    std::fs::remove_file("./tests/resources/and_gate/generated_and_gate.v")
+        .expect("Failed to remove generated file.");
 
-    assert_eq!(expected_verilog, generated_verilog);
+    assert_eq!(expected, generated);
 }
