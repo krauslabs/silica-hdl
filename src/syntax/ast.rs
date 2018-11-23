@@ -1,5 +1,10 @@
 
 #[derive(Clone, Debug)]
+pub struct Ast {
+	pub top: Box<Mod>,
+}
+
+#[derive(Clone, Debug)]
 pub struct Mod {
 	pub id: Ident,
 	pub ports: Vec<Box<Port>>,

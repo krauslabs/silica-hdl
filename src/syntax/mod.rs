@@ -17,8 +17,6 @@
 pub mod ast;
 lalrpop_mod!(grammar);
 
-use self::ast::Mod;
-
 pub struct Parser {
 	input: String,
 }
@@ -37,7 +35,7 @@ impl Parser {
 		Parser{ input: input_stripped.to_string() }
 	}
 
-	pub fn parse(&self) -> Box<Mod> {
-		grammar::TopModParser::new().parse(&self.input).unwrap()
+	pub fn parse(&self) -> ast::Ast {
+		grammar::SourceFileParser::new().parse(&self.input).unwrap()
 	}
 }

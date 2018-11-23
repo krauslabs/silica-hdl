@@ -1,8 +1,14 @@
-use super::CodeGen;
+use codegen::CodeGen;
 use syntax::ast;
 
 pub trait ToVerilog {
     fn to_verilog(&self, _codegen: &CodeGen) -> String;
+}
+
+impl ToVerilog for ast::Ast {
+    fn to_verilog(&self, _codegen: &CodeGen) -> String {
+        self.top.to_verilog(&_codegen)
+    }
 }
 
 impl ToVerilog for ast::Mod {

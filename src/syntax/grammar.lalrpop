@@ -2,9 +2,9 @@ use syntax::ast::*;
 
 grammar;
 
-pub TopMod: Box<Mod> = {
-    "top" <module:Mod> => <>,
-};
+pub SourceFile: Ast = {
+    "top" <module:Mod> => Ast{ top: module },
+}
 
 Mod: Box<Mod> = {
     "mod" <id:Ident> "(" <ports:Ports> ")" "{" <stmts:Stmt*> "}" => Box::new(Mod{ id: id, ports: ports, stmts: stmts }),
