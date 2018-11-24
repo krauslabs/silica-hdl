@@ -1,13 +1,11 @@
-#[macro_use] extern crate lalrpop_util;
+
 extern crate clap;
-extern crate regex;
+extern crate codegen;
+extern crate syntax;
 
 use std::fs::File;
 use std::io::Read;
 use std::io::Write;
-
-mod codegen;
-mod syntax;
 
 fn main() {
 

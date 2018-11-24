@@ -1,0 +1,11 @@
+[package]
+name = "codegen"
+version = "0.0.0"
+authors = ["Nick Kraus <nick@krauslabs.com>"]
+
+[lib]
+name = "codegen"
+path = "src/lib.rs"
+
+[dependencies]
+syntax = { path = "../libsyntax" }

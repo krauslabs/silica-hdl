@@ -6,13 +6,12 @@
 //! The entry to the parser is the parse() function of the Parser struct, which
 //! will start at the 'top module' of the input string and parse from there.
 //!
-//! TODO: The top level of parsing should start atleast at the source file
-//! level, as each source file can define multiple modules, constants, types,
-//! etc... at its top level before defining the top module.
-//!
 //! TODO: Once multiple source files are supported the top level of parsing will
 //! need to be changed to be something at the 'project' level, whether thats a
 //! specific design or a 'library' or something else is to be determined.
+
+#[macro_use] extern crate lalrpop_util;
+extern crate regex;
 
 pub mod ast;
 lalrpop_mod!(grammar);

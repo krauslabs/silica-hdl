@@ -5,8 +5,12 @@ authors = ["Nick Kraus <nick@krauslabs.com>"]
 
 [dependencies]
 clap = "2.32.0"
-lalrpop-util = "0.16.1"
-regex = "1.0.6"
+codegen = { path = "src/libcodegen" }
+syntax = { path = "src/libsyntax" }
 
-[build-dependencies]
-lalrpop = "0.16.1"
+[workspace]
+members = [
+	"./",
+	"src/libcodegen",
+	"src/libsyntax",
+]
