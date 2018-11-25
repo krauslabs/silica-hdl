@@ -14,6 +14,8 @@
 extern crate regex;
 
 pub mod ast;
+pub mod visit;
+
 lalrpop_mod!(grammar);
 
 pub struct Parser {
