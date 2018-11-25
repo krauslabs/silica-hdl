@@ -1,34 +1,36 @@
-use CodeGen;
 use syntax::ast;
 
 pub trait ToVerilog {
-    fn to_verilog(&self, _codegen: &CodeGen) -> String;
+    fn to_verilog(&self) -> String;
 }
 
 impl ToVerilog for ast::Ast {
-    fn to_verilog(&self, _codegen: &CodeGen) -> String {
-        self.top.to_verilog(&_codegen)
+    fn to_verilog(&self) -> String {
+        let ast::Ast(module) = self;
+        module.to_verilog()
     }
 }
 
 impl ToVerilog for ast::Mod {
-    fn to_verilog(&self, _codegen: &CodeGen) -> String {
+    fn to_verilog(&self) -> String {
 
-        let mut output = format!("module {} ( \n", self.id.to_verilog(_codegen));
+        let ast::Mod(id, ports, stmts) = self;
 
-        let port_len = self.ports.len();
-        for (idx, port) in self.ports.iter().enumerate() {
+        let mut output = format!("module {} ( \n", id.to_verilog());
+
+        let port_len = ports.len();
+        for (idx, port) in ports.iter().enumerate() {
             if idx == (port_len - 1) {
-                output.push_str(&format!("\t{} \n", port.to_verilog(_codegen)));
+                output.push_str(&format!("\t{} \n", port.to_verilog()));
             } else {
-                output.push_str(&format!("\t{}, \n", port.to_verilog(_codegen)));
+                output.push_str(&format!("\t{}, \n", port.to_verilog()));
             }
         }
 
         output.push_str("); \n");
 
-        for stmt in self.stmts.iter() {
-            output.push_str(&format!("\t{} \n", stmt.to_verilog(_codegen)));
+        for stmt in stmts.iter() {
+            output.push_str(&format!("\t{} \n", stmt.to_verilog()));
         }
 
         output.push_str("endmodule \n");
@@ -38,64 +40,82 @@ impl ToVerilog for ast::Mod {
 }
 
 impl ToVerilog for ast::Port {
-    fn to_verilog(&self, _codegen: &CodeGen) -> String {
+    fn to_verilog(&self) -> String {
+        let ast::Port(dir, id, ty) = self;
+        format!("{} {} {}",
+            dir.to_verilog(),
+            ty.to_verilog(),
+            id.to_verilog())
+    }
+}
 
-        let dir_str = match self.dir {
-            ast::PortDir::Input => "input",
-            ast::PortDir::Output => "output",
-        };
+impl ToVerilog for ast::Dir {
+    fn to_verilog(&self) -> String {
+        match self {
+            ast::Dir::Input => "input".to_string(),
+            ast::Dir::Output => "output".to_string(),
+        }
+    }
+}
 
-        let ty_str = match self.ty {
-            ast::Type::Bool => "wire",
-        };
-
-        format!("{} {} {}", dir_str, ty_str, self.id.to_verilog(_codegen))
+impl ToVerilog for ast::Type {
+    fn to_verilog(&self) -> String {
+        match self {
+            ast::Type::Bool => "wire".to_string(),
+        }
     }
 }
 
 impl ToVerilog for ast::Stmt {
-    fn to_verilog(&self, _codegen: &CodeGen) -> String {
-        match self.kind {
-            ast::StmtKind::Assign(ref assign) => assign.to_verilog(_codegen),
+    fn to_verilog(&self) -> String {
+        match self {
+            ast::Stmt::Assign(ref id, ref ex) => {
+                format!("assign {} = {};",
+                    id.to_verilog(),
+                    ex.to_verilog())
+            }
         }
-    }
-}
-
-impl ToVerilog for ast::AssignStmt {
-    fn to_verilog(&self, _codegen: &CodeGen) -> String {
-        format!("assign {} = {};", self.id.to_verilog(_codegen), self.expr.to_verilog(_codegen))
     }
 }
 
 impl ToVerilog for ast::Expr {
-    fn to_verilog(&self, _codegen: &CodeGen) -> String {
-        match self.kind {
-            ast::ExprKind::Binary(ref binary) => binary.to_verilog(_codegen),
-            ast::ExprKind::Ident(ref ident) => ident.to_verilog(_codegen),
-            ast::ExprKind::Litrl(ref litrl) => litrl.to_verilog(_codegen), 
+    fn to_verilog(&self) -> String {
+        match self {
+            ast::Expr::Binary(ref ex1, ref op, ref ex2) => {
+                format!("{} {} {}",
+                    ex1.to_verilog(),
+                    op.to_verilog(),
+                    ex2.to_verilog())
+            }
+            ast::Expr::Ident(ref ident) => {
+                ident.to_verilog()
+            }
+            ast::Expr::Litrl(ref litrl) => {
+                litrl.to_verilog()
+            }
         }
     }
 }
 
-impl ToVerilog for ast::BinaryExpr {
-    fn to_verilog(&self, _codegen: &CodeGen) -> String {
-        let op_str = match self.op {
+impl ToVerilog for ast::BinaryOp {
+    fn to_verilog(&self) -> String {
+        match self {
             ast::BinaryOp::BitAnd => "&".to_string(),
             ast::BinaryOp::BitOr => "|".to_string(),
-        };
-
-        format!("{} {} {}", self.ex1.to_verilog(_codegen), op_str, self.ex2.to_verilog(_codegen))
+        }
     }
 }
 
 impl ToVerilog for ast::Ident {
-    fn to_verilog(&self, _codegen: &CodeGen) -> String {
-        self.val.clone()
+    fn to_verilog(&self) -> String {
+        let ast::Ident(s) = self;
+        s.to_string()
     }
 }
 
 impl ToVerilog for ast::Litrl {
-    fn to_verilog(&self, _codegen: &CodeGen) -> String {
-        self.val.clone()
+    fn to_verilog(&self) -> String {
+        let ast::Litrl(s) = self;
+        s.to_string()
     }
 }

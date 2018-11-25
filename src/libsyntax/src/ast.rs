@@ -1,25 +1,15 @@
 
 #[derive(Clone, Debug)]
-pub struct Ast {
-	pub top: Box<Mod>,
-}
+pub struct Ast(pub Mod);
 
 #[derive(Clone, Debug)]
-pub struct Mod {
-	pub id: Ident,
-	pub ports: Vec<Box<Port>>,
-	pub stmts: Vec<Box<Stmt>>,
-}
+pub struct Mod(pub Ident, pub Vec<Port>, pub Vec<Stmt>);
 
 #[derive(Clone, Debug)]
-pub struct Port {
-	pub dir: PortDir,
-	pub id: Ident,
-	pub ty: Type,
-}
+pub struct Port(pub Dir, pub Ident, pub Type);
 
 #[derive(Clone, Debug)]
-pub enum PortDir {
+pub enum Dir {
 	Input,
 	Output,
 }
@@ -30,38 +20,15 @@ pub enum Type {
 }
 
 #[derive(Clone, Debug)]
-pub struct Stmt {
-	pub kind: StmtKind,
+pub enum Stmt {
+	Assign(Ident, Expr),
 }
 
 #[derive(Clone, Debug)]
-pub enum StmtKind {
-	Assign(AssignStmt),
-}
-
-#[derive(Clone, Debug)]
-pub struct AssignStmt {
-	pub id: Ident,
-	pub expr: Box<Expr>,
-}
-
-#[derive(Clone, Debug)]
-pub struct Expr {
-	pub kind: ExprKind,
-}
-
-#[derive(Clone, Debug)]
-pub enum ExprKind {
-	Binary(BinaryExpr),
+pub enum Expr {
+	Binary(Box<Expr>, BinaryOp, Box<Expr>),
 	Ident(Ident),
 	Litrl(Litrl),
-}
-
-#[derive(Clone, Debug)]
-pub struct BinaryExpr {
-	pub op: BinaryOp,
-	pub ex1: Box<Expr>,
-	pub ex2: Box<Expr>,
 }
 
 #[derive(Clone, Debug)]
@@ -71,13 +38,7 @@ pub enum BinaryOp {
 }
 
 #[derive(Clone, Debug)]
-pub struct Ident {
-	pub val: String,
-}
+pub struct Ident(pub String);
 
 #[derive(Clone, Debug)]
-pub struct Litrl {
-	pub val: String,
-}
-
-
+pub struct Litrl(pub String);

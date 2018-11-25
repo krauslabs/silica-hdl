@@ -22,6 +22,6 @@ impl CodeGen {
     }
 
     pub fn generate(&self) -> String {
-        self.ast.to_verilog(&self)
+        self.ast.to_verilog()
     }
 }

@@ -3,46 +3,46 @@ use ast::*;
 grammar;
 
 pub SourceFile: Ast = {
-    "top" <module:Mod> => Ast{ top: module },
-}
-
-Mod: Box<Mod> = {
-    "mod" <id:Ident> "(" <ports:Ports> ")" "{" <stmts:Stmt*> "}" => Box::new(Mod{ id: id, ports: ports, stmts: stmts }),
+    "top" <module:Mod> => Ast(module),
 };
 
-Ports: Vec<Box<Port>> = Comma<Port>;
-
-Port: Box<Port> = {
-    "in" <id:Ident> ":" <ty:Type> => Box::new(Port{ dir: PortDir::Input, id: id, ty: ty }),
-    "out" <id:Ident> ":" <ty:Type> => Box::new(Port{ dir: PortDir::Output, id: id, ty: ty }),
+Mod: Mod = {
+    "mod" <id:Ident> "(" <ports:Ports> ")" "{" <stmts:Stmt*> "}" => Mod(id, ports, stmts),
 };
 
-Stmt: Box<Stmt> = {
-    <id:Ident> "=" <ex:Expr> ";" => Box::new(Stmt{ kind: StmtKind::Assign(AssignStmt{ id: id, expr: ex })}),
-};
+Ports: Vec<Port> = Comma<Port>;
 
-Expr: Box<Expr> = {
-    <l:Expr> "&" <r:Term> => Box::new(Expr{kind: ExprKind::Binary(BinaryExpr{ op: BinaryOp::BitAnd, ex1: l, ex2: r }) }),
-    <l:Expr> "|" <r:Term> => Box::new(Expr{kind: ExprKind::Binary(BinaryExpr{ op: BinaryOp::BitOr, ex1: l, ex2: r }) }),
-    Term,
-};
-
-Term: Box<Expr> = {
-    "(" <Expr> ")" => <>,
-    <Ident> => Box::new(Expr{ kind: ExprKind::Ident(<>) }),
-    <Litrl> => Box::new(Expr{ kind: ExprKind::Litrl(<>) }),
+Port: Port = {
+    "in" <id:Ident> ":" <ty:Type> => Port(Dir::Input, id, ty),
+    "out" <id:Ident> ":" <ty:Type> => Port(Dir::Output, id, ty),
 };
 
 Type: Type = {
     "bool" => Type::Bool,
-}
+};
+
+Stmt: Stmt = {
+    <id:Ident> "=" <ex:Expr> ";" => Stmt::Assign(id, ex),
+};
+
+Expr: Expr = {
+    <l:Expr> "&" <r:Term> => Expr::Binary(Box::new(l), BinaryOp::BitAnd, Box::new(r)),
+    <l:Expr> "|" <r:Term> => Expr::Binary(Box::new(l), BinaryOp::BitOr, Box::new(r)),
+    Term,
+};
+
+Term: Expr = {
+    "(" <ex:Expr> ")" => ex,
+    <id:Ident> => Expr::Ident(id),
+    <lit:Litrl> => Expr::Litrl(lit),
+};
 
 Ident: Ident = {
-    r"[a-zA-Z][0-9A-Za-z_]*" => Ident{ val: <>.to_string() },
+    r"[a-zA-Z][0-9A-Za-z_]*" => Ident(<>.to_string()),
 };
 
 Litrl: Litrl = {
-    r"[0-9]+" => Litrl{ val: <>.to_string() },
+    r"[0-9]+" => Litrl(<>.to_string()),
 };
 
 // generic helper macros
