@@ -31,7 +31,7 @@ fn main() {
     let mut input = String::new();
     input_file.read_to_string(&mut input).expect("Failed to read file");
 
-    let ast = syntax::Parser::new(&input).parse();
+    let ast = syntax::Ast::new(&input);
     let verilog = verilog::Verilog::new().build(&ast);
 
     let output_filename = matches.value_of("output").unwrap();

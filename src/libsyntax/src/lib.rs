@@ -18,12 +18,12 @@ pub mod visit;
 
 lalrpop_mod!(grammar);
 
-pub struct Parser {
-	input: String,
+pub struct Ast {
+	pub top: ast::Mod,
 }
 
-impl Parser {
-	pub fn new(input: &str) -> Parser {
+impl Ast {
+	pub fn new(input: &str) -> Ast {
 
 		// strip the input of all comments before returning the struct
 		//
@@ -33,10 +33,31 @@ impl Parser {
 		let re = regex::Regex::new(r"//.*").unwrap();
 		let input_stripped = re.replace_all(input, "");
 
-		Parser{ input: input_stripped.to_string() }
-	}
-
-	pub fn parse(&self) -> ast::Ast {
-		grammar::SourceFileParser::new().parse(&self.input).unwrap()
+		grammar::SourceFileParser::new().parse(&input_stripped).unwrap()
 	}
 }
+
+// pub struct Ast(pub Mod);
+
+// pub struct Parser {
+// 	input: String,
+// }
+
+// impl Parser {
+// 	pub fn new(input: &str) -> Parser {
+
+// 		// strip the input of all comments before returning the struct
+// 		//
+// 		// TODO: implement this in lalrpop grammar when possible, comments
+// 		// stripped here cause byte indices of 'input' to not match the
+// 		// actual file that they are taken from.
+// 		let re = regex::Regex::new(r"//.*").unwrap();
+// 		let input_stripped = re.replace_all(input, "");
+
+// 		Parser{ input: input_stripped.to_string() }
+// 	}
+
+// 	pub fn parse(&self) -> ast::Ast {
+// 		grammar::SourceFileParser::new().parse(&self.input).unwrap()
+// 	}
+// }

@@ -1,9 +1,10 @@
 use ast::*;
+use super::Ast;
 
 grammar;
 
 pub SourceFile: Ast = {
-    "top" <module:Mod> => Ast(module),
+    "top" <module:Mod> => Ast{ top: module, },
 };
 
 Mod: Mod = {

@@ -1,8 +1,5 @@
 
 #[derive(Clone, Debug)]
-pub struct Ast(pub Mod);
-
-#[derive(Clone, Debug)]
 pub struct Mod(pub Ident, pub Vec<Port>, pub Vec<Stmt>);
 
 #[derive(Clone, Debug)]

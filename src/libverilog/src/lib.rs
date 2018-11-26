@@ -19,10 +19,8 @@ impl Verilog {
 		Verilog { verilog: String::new(), }
 	}
 
-	pub fn build(&mut self, ast: &Ast) -> String {
-		let Ast(m) = ast;
-		self.visit_mod(m);
-
+	pub fn build(&mut self, ast: &syntax::Ast) -> String {
+		self.visit_mod(&ast.top);
 		self.verilog.clone()
 	}
 }
