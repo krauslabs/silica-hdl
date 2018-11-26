@@ -1,10 +1,10 @@
 [package]
-name = "codegen"
+name = "verilog"
 version = "0.0.0"
 authors = ["Nick Kraus <nick@krauslabs.com>"]
 
 [lib]
-name = "codegen"
+name = "verilog"
 path = "src/lib.rs"
 
 [dependencies]

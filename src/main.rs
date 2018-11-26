@@ -1,7 +1,7 @@
 
 extern crate clap;
-extern crate codegen;
 extern crate syntax;
+extern crate verilog;
 
 use std::fs::File;
 use std::io::Read;
@@ -32,7 +32,7 @@ fn main() {
     input_file.read_to_string(&mut input).expect("Failed to read file");
 
     let ast = syntax::Parser::new(&input).parse();
-    let verilog = codegen::CodeGen::new(ast).generate();
+    let verilog = verilog::Verilog::new().build(&ast);
 
     let output_filename = matches.value_of("output").unwrap();
     let mut output_file = File::create(output_filename).expect("Unable to open output file");
