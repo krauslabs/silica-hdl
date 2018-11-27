@@ -18,6 +18,7 @@ pub mod visit;
 
 lalrpop_mod!(grammar);
 
+#[derive(Clone, Debug, PartialEq)]
 pub struct Ast {
 	pub top: ast::Mod,
 }
