@@ -26,9 +26,15 @@ Stmt: Stmt = {
     <id:Ident> "=" <ex:Expr> ";" => Stmt::Assign(id, ex),
 };
 
-Expr: Expr = {
-    <l:Expr> "&" <r:ShiftExpr> => Expr::Binary(Box::new(l), BinaryOp::BitAnd, Box::new(r)),
-    <l:Expr> "|" <r:ShiftExpr> => Expr::Binary(Box::new(l), BinaryOp::BitOr, Box::new(r)),
+Expr: Expr = BitOrExpr;
+
+BitOrExpr: Expr = {
+    <l:BitOrExpr> "|" <r:BitAndExpr> => Expr::Binary(Box::new(l), BinaryOp::BitOr, Box::new(r)),
+    BitAndExpr,
+};
+
+BitAndExpr: Expr = {
+    <l:BitAndExpr> "&" <r:ShiftExpr> => Expr::Binary(Box::new(l), BinaryOp::BitAnd, Box::new(r)),
     ShiftExpr,
 };
 
