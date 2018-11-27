@@ -3,7 +3,13 @@ module expressions (
 	input wire b,
 	input wire c,
 	input wire d,
-	output wire y
+	output wire x,
+	output wire y,
+	output wire z
 );
-	assign y = ( a << 1 ) >> 2 & ( b ^ c ) | d;
+	assign x = a << 1 >> 1 & b ^ c | d;
+
+	assign y = ~a & &a & ^a & |a;
+
+	assign z = ( a & b ) | c;
 endmodule

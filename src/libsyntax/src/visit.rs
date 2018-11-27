@@ -9,6 +9,7 @@ pub trait Visitor: Sized {
 	fn visit_type(&mut self, t: &Type) { walk_type(self, t); }
 	fn visit_stmt(&mut self, s: &Stmt) { walk_stmt(self, s); }
 	fn visit_expr(&mut self, e: &Expr) { walk_expr(self, e); }
+	fn visit_unary_op(&mut self, u: &UnaryOp) { walk_unary_op(self, u); }
 	fn visit_binary_op(&mut self, b: &BinaryOp) { walk_binary_op(self, b); }
 	fn visit_ident(&mut self, i: &Ident) { walk_ident(self, i); }
 	fn visit_litrl(&mut self, l: &Litrl) { walk_litrl(self, l); }
@@ -59,6 +60,9 @@ pub fn walk_expr<V: Visitor>(visitor: &mut V, e: &Expr) {
 			visitor.visit_binary_op(op);
 			visitor.visit_expr(ex2);
 		}
+		Expr::Unary(ref op, ref ex) => {
+			visitor.visit_unary_op(op);
+		}
 		Expr::Paren(ref ex) => {
 			visitor.visit_expr(ex);
 		}
@@ -69,6 +73,10 @@ pub fn walk_expr<V: Visitor>(visitor: &mut V, e: &Expr) {
 			visitor.visit_litrl(lit);
 		}
 	}
+}
+
+pub fn walk_unary_op<V: Visitor>(visitor: &mut V, u: &UnaryOp) {
+	
 }
 
 pub fn walk_binary_op<V: Visitor>(visitor: &mut V, b: &BinaryOp) {

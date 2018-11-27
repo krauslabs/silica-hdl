@@ -24,6 +24,7 @@ pub enum Stmt {
 #[derive(Clone, Debug, PartialEq)]
 pub enum Expr {
 	Binary(Box<Expr>, BinaryOp, Box<Expr>),
+	Unary(UnaryOp, Box<Expr>),
 	Paren(Box<Expr>),
 	Ident(Ident),
 	Litrl(Litrl),
@@ -36,6 +37,14 @@ pub enum BinaryOp {
 	BitAnd,
 	BitXor,
 	BitOr,
+}
+
+#[derive(Clone, Debug, PartialEq)]
+pub enum UnaryOp {
+	Negate,
+	ReductAnd,
+	ReductXor,
+	ReductOr,
 }
 
 #[derive(Clone, Debug, PartialEq)]

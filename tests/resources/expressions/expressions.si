@@ -3,7 +3,16 @@ top mod expressions (
     in b: bit,
     in c: bit,
     in d: bit,
+    out x: bit,
     out y: bit,
+    out z: bit
 ) {
-    y = ( a << 1 ) >> 2 & ( b ^ c ) | d;
+	// checks all binary operators
+    x = a << 1 >> 1 & b ^ c | d;
+
+    // checks all unary operators
+    y = ~a & &a & ^a & |a;
+
+    // checks parenthesis
+    z = ( a & b ) | c;
 }

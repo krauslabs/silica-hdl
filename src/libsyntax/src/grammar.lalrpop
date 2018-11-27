@@ -44,8 +44,16 @@ BitAndExpr: Expr = {
 };
 
 ShiftExpr: Expr = {
-    <l:ShiftExpr> "<<" <r:Term> => Expr::Binary(Box::new(l), BinaryOp::ShiftLeft, Box::new(r)),
-    <l:ShiftExpr> ">>" <r:Term> => Expr::Binary(Box::new(l), BinaryOp::ShiftRight, Box::new(r)),
+    <l:ShiftExpr> "<<" <r:UnaryExpr> => Expr::Binary(Box::new(l), BinaryOp::ShiftLeft, Box::new(r)),
+    <l:ShiftExpr> ">>" <r:UnaryExpr> => Expr::Binary(Box::new(l), BinaryOp::ShiftRight, Box::new(r)),
+    UnaryExpr,
+};
+
+UnaryExpr: Expr = {
+    "~" <ex:UnaryExpr> => Expr::Unary(UnaryOp::Negate, Box::new(ex)),
+    "&" <ex:UnaryExpr> => Expr::Unary(UnaryOp::ReductAnd, Box::new(ex)),
+    "^" <ex:UnaryExpr> => Expr::Unary(UnaryOp::ReductXor, Box::new(ex)),
+    "|" <ex:UnaryExpr> => Expr::Unary(UnaryOp::ReductOr, Box::new(ex)),
     Term,
 };
 

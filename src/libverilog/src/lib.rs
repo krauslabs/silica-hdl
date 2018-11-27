@@ -105,6 +105,10 @@ impl Visitor for Verilog {
 				self.verilog.push_str(" ");
 				self.visit_expr(ex2);
 			}
+			Expr::Unary(ref op, ref ex) => {
+				self.visit_unary_op(op);
+				self.visit_expr(ex);
+			}
 			Expr::Paren(ref ex) => {
 				self.verilog.push_str("( ");
 				self.visit_expr(ex);
@@ -115,6 +119,23 @@ impl Visitor for Verilog {
 			}
 			Expr::Litrl(ref lit) => {
 				self.visit_litrl(lit);
+			}
+		}
+	}
+
+	fn visit_unary_op(&mut self, u: &UnaryOp) {
+		match u {
+			UnaryOp::Negate => {
+				self.verilog.push_str("~");
+			}
+			UnaryOp::ReductAnd => {
+				self.verilog.push_str("&");
+			}
+			UnaryOp::ReductXor => {
+				self.verilog.push_str("^");
+			}
+			UnaryOp::ReductOr => {
+				self.verilog.push_str("|");
 			}
 		}
 	}
