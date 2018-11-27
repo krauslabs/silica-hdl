@@ -29,7 +29,12 @@ Stmt: Stmt = {
 Expr: Expr = BitOrExpr;
 
 BitOrExpr: Expr = {
-    <l:BitOrExpr> "|" <r:BitAndExpr> => Expr::Binary(Box::new(l), BinaryOp::BitOr, Box::new(r)),
+    <l:BitOrExpr> "|" <r:BitXorExpr> => Expr::Binary(Box::new(l), BinaryOp::BitOr, Box::new(r)),
+    BitXorExpr,
+};
+
+BitXorExpr: Expr = {
+    <l:BitXorExpr> "^" <r:BitAndExpr> => Expr::Binary(Box::new(l), BinaryOp::BitXor, Box::new(r)),
     BitAndExpr,
 };
 

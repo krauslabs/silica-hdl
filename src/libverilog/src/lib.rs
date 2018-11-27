@@ -130,6 +130,9 @@ impl Visitor for Verilog {
 			BinaryOp::BitAnd => {
 				self.verilog.push_str("&");
 			}
+			BinaryOp::BitXor => {
+				self.verilog.push_str("^");
+			}
 			BinaryOp::BitOr => {
 				self.verilog.push_str("|");
 			}

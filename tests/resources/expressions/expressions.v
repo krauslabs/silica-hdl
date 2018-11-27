@@ -1,11 +1,9 @@
 module expressions (
 	input wire a,
 	input wire b,
-	output wire x,
-	output wire y,
-	output wire z
+	input wire c,
+	input wire d,
+	output wire y
 );
-    assign x = a << 1;
-	assign y = b >> 1;
-	assign z = ( a & b ) | x;
+	assign y = ( a << 1 ) >> 2 & ( b ^ c ) | d;
 endmodule

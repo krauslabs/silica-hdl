@@ -34,6 +34,7 @@ pub enum BinaryOp {
 	ShiftLeft,
 	ShiftRight,
 	BitAnd,
+	BitXor,
 	BitOr,
 }
 

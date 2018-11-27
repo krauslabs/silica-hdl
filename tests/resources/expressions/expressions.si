@@ -1,11 +1,9 @@
 top mod expressions (
     in a: bit,
     in b: bit,
-    out x: bit,
+    in c: bit,
+    in d: bit,
     out y: bit,
-    out z: bit
 ) {
-    x = a << 1;
-    y = b >> 1;
-    z = ( a & b ) | x;
+    y = ( a << 1 ) >> 2 & ( b ^ c ) | d;
 }
