@@ -19,7 +19,7 @@ Port: Port = {
 };
 
 Type: Type = {
-    "bool" => Type::Bool,
+    "bit" => Type::Bit,
 };
 
 Stmt: Stmt = {

@@ -1,7 +1,7 @@
 top mod and_gate (
-    in a: bool,
-    in b: bool,
-    out y: bool
+    in a: bit,
+    in b: bit,
+    out y: bit
 ) {
     y = a & b;
 }

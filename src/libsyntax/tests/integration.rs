@@ -9,16 +9,16 @@ fn trailing_comma() {
 
     let no_comma = 
         "top mod a (
-            in a: bool,
-            out b: bool
+            in a: bit,
+            out b: bit
         ) {
             b = a;
         }";
 
     let comma = 
         "top mod a (
-            in a: bool,
-            out b: bool,
+            in a: bit,
+            out b: bit,
         ) {
             b = a;
         }";

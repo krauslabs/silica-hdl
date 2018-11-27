@@ -13,7 +13,7 @@ pub enum Dir {
 
 #[derive(Clone, Debug, PartialEq)]
 pub enum Type {
-	Bool,
+	Bit,
 }
 
 #[derive(Clone, Debug, PartialEq)]

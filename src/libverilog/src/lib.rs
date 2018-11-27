@@ -78,7 +78,7 @@ impl Visitor for Verilog {
 
 	fn visit_type(&mut self, t: &Type) {
 		match t {
-			Type::Bool => {
+			Type::Bit => {
 				self.verilog.push_str("wire");
 			}
 		}
