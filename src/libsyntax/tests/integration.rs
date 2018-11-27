@@ -1,10 +1,10 @@
 extern crate syntax;
 
-#[test]
 // Tests that trailing commas (wherever they are allowed) do not affect the
 // AST that is generated.
 //
 // Currently port lists are the only places where trailing commas are allowed.
+#[test]
 fn trailing_comma() {
 
     let no_comma = 
