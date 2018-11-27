@@ -27,13 +27,19 @@ Stmt: Stmt = {
 };
 
 Expr: Expr = {
-    <l:Expr> "&" <r:Term> => Expr::Binary(Box::new(l), BinaryOp::BitAnd, Box::new(r)),
-    <l:Expr> "|" <r:Term> => Expr::Binary(Box::new(l), BinaryOp::BitOr, Box::new(r)),
+    <l:Expr> "&" <r:ShiftExpr> => Expr::Binary(Box::new(l), BinaryOp::BitAnd, Box::new(r)),
+    <l:Expr> "|" <r:ShiftExpr> => Expr::Binary(Box::new(l), BinaryOp::BitOr, Box::new(r)),
+    ShiftExpr,
+};
+
+ShiftExpr: Expr = {
+    <l:ShiftExpr> "<<" <r:Term> => Expr::Binary(Box::new(l), BinaryOp::ShiftLeft, Box::new(r)),
+    <l:ShiftExpr> ">>" <r:Term> => Expr::Binary(Box::new(l), BinaryOp::ShiftRight, Box::new(r)),
     Term,
 };
 
 Term: Expr = {
-    "(" <ex:Expr> ")" => ex,
+    "(" <ex:Expr> ")" => Expr::Paren(Box::new(ex)),
     <id:Ident> => Expr::Ident(id),
     <lit:Litrl> => Expr::Litrl(lit),
 };

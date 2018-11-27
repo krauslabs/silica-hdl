@@ -1,7 +1,0 @@
-top mod and_gate (
-    in a: bit,
-    in b: bit,
-    out y: bit
-) {
-    y = a & b;
-}

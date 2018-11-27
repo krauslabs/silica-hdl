@@ -24,12 +24,15 @@ pub enum Stmt {
 #[derive(Clone, Debug, PartialEq)]
 pub enum Expr {
 	Binary(Box<Expr>, BinaryOp, Box<Expr>),
+	Paren(Box<Expr>),
 	Ident(Ident),
 	Litrl(Litrl),
 }
 
 #[derive(Clone, Debug, PartialEq)]
 pub enum BinaryOp {
+	ShiftLeft,
+	ShiftRight,
 	BitAnd,
 	BitOr,
 }

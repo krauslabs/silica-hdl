@@ -53,10 +53,14 @@ pub fn walk_stmt<V: Visitor>(visitor: &mut V, s: &Stmt) {
 
 pub fn walk_expr<V: Visitor>(visitor: &mut V, e: &Expr) {
 	match e {
+
 		Expr::Binary(ref ex1, ref op, ref ex2) => {
 			visitor.visit_expr(ex1);
 			visitor.visit_binary_op(op);
 			visitor.visit_expr(ex2);
+		}
+		Expr::Paren(ref ex) => {
+			visitor.visit_expr(ex);
 		}
 		Expr::Ident(ref id) => {
 			visitor.visit_ident(id);

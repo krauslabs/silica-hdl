@@ -105,6 +105,11 @@ impl Visitor for Verilog {
 				self.verilog.push_str(" ");
 				self.visit_expr(ex2);
 			}
+			Expr::Paren(ref ex) => {
+				self.verilog.push_str("( ");
+				self.visit_expr(ex);
+				self.verilog.push_str(" )");
+			}
 			Expr::Ident(ref id) => {
 				self.visit_ident(id);
 			}
@@ -116,6 +121,12 @@ impl Visitor for Verilog {
 
 	fn visit_binary_op(&mut self, b: &BinaryOp) {
 		match b {
+			BinaryOp::ShiftLeft => {
+				self.verilog.push_str("<<");
+			}
+			BinaryOp::ShiftRight => {
+				self.verilog.push_str(">>");
+			}
 			BinaryOp::BitAnd => {
 				self.verilog.push_str("&");
 			}
