@@ -17,6 +17,8 @@ pub mod ast;
 pub mod token;
 pub mod visit;
 
+mod lexer;
+
 lalrpop_mod!(grammar);
 
 #[derive(Clone, Debug, PartialEq)]
