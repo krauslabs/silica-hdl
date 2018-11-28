@@ -22,46 +22,52 @@ Type: Type = {
     "bit" => Type::Bit,
 };
 
+// Statements
+
 Stmt: Stmt = {
     <id:Ident> "=" <ex:Expr> ";" => Stmt::Assign(id, ex),
 };
 
-Expr: Expr = BitOrExpr;
+// Expressions
 
-BitOrExpr: Expr = {
-    <l:BitOrExpr> "|" <r:BitXorExpr> => Expr::Binary(Box::new(l), BinaryOp::BitOr, Box::new(r)),
-    BitXorExpr,
+Expr: Expr = ExprBitOr;
+
+ExprBitOr: Expr = {
+    <l:ExprBitOr> "|" <r:ExprBitXor> => Expr::Binary(Box::new(l), BinaryOp::BitOr, Box::new(r)),
+    ExprBitXor,
 };
 
-BitXorExpr: Expr = {
-    <l:BitXorExpr> "^" <r:BitAndExpr> => Expr::Binary(Box::new(l), BinaryOp::BitXor, Box::new(r)),
-    BitAndExpr,
+ExprBitXor: Expr = {
+    <l:ExprBitXor> "^" <r:ExprBitAnd> => Expr::Binary(Box::new(l), BinaryOp::BitXor, Box::new(r)),
+    ExprBitAnd,
 };
 
-BitAndExpr: Expr = {
-    <l:BitAndExpr> "&" <r:ShiftExpr> => Expr::Binary(Box::new(l), BinaryOp::BitAnd, Box::new(r)),
-    ShiftExpr,
+ExprBitAnd: Expr = {
+    <l:ExprBitAnd> "&" <r:ExprShift> => Expr::Binary(Box::new(l), BinaryOp::BitAnd, Box::new(r)),
+    ExprShift,
 };
 
-ShiftExpr: Expr = {
-    <l:ShiftExpr> "<<" <r:UnaryExpr> => Expr::Binary(Box::new(l), BinaryOp::ShiftLeft, Box::new(r)),
-    <l:ShiftExpr> ">>" <r:UnaryExpr> => Expr::Binary(Box::new(l), BinaryOp::ShiftRight, Box::new(r)),
-    UnaryExpr,
+ExprShift: Expr = {
+    <l:ExprShift> "<<" <r:ExprUnary> => Expr::Binary(Box::new(l), BinaryOp::ShiftLeft, Box::new(r)),
+    <l:ExprShift> ">>" <r:ExprUnary> => Expr::Binary(Box::new(l), BinaryOp::ShiftRight, Box::new(r)),
+    ExprUnary,
 };
 
-UnaryExpr: Expr = {
-    "~" <ex:UnaryExpr> => Expr::Unary(UnaryOp::Negate, Box::new(ex)),
-    "&" <ex:UnaryExpr> => Expr::Unary(UnaryOp::ReductAnd, Box::new(ex)),
-    "^" <ex:UnaryExpr> => Expr::Unary(UnaryOp::ReductXor, Box::new(ex)),
-    "|" <ex:UnaryExpr> => Expr::Unary(UnaryOp::ReductOr, Box::new(ex)),
-    Term,
+ExprUnary: Expr = {
+    "~" <ex:ExprUnary> => Expr::Unary(UnaryOp::Negate, Box::new(ex)),
+    "&" <ex:ExprUnary> => Expr::Unary(UnaryOp::ReductAnd, Box::new(ex)),
+    "^" <ex:ExprUnary> => Expr::Unary(UnaryOp::ReductXor, Box::new(ex)),
+    "|" <ex:ExprUnary> => Expr::Unary(UnaryOp::ReductOr, Box::new(ex)),
+    ExprTerm,
 };
 
-Term: Expr = {
+ExprTerm: Expr = {
     "(" <ex:Expr> ")" => Expr::Paren(Box::new(ex)),
     <id:Ident> => Expr::Ident(id),
     <lit:Litrl> => Expr::Litrl(lit),
 };
+
+// Other Terminals
 
 Ident: Ident = {
     r"[a-zA-Z][0-9A-Za-z_]*" => Ident(<>.to_string()),
@@ -71,7 +77,7 @@ Litrl: Litrl = {
     r"[0-9]+" => Litrl(<>.to_string()),
 };
 
-// generic helper macros
+// Helper Macros
 
 Comma<T>: Vec<T> = {
     <v:(<T> ",")*> <e:T?> => match e {

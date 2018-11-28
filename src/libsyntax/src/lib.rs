@@ -14,6 +14,7 @@
 extern crate regex;
 
 pub mod ast;
+pub mod token;
 pub mod visit;
 
 lalrpop_mod!(grammar);
