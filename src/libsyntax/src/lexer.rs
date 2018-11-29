@@ -1,30 +1,36 @@
-use std::iter::Peekable;
-use std::str::Chars;
 
-use token::{self, Token};
+use std::mem;
+use std::str::CharIndices;
 
-pub type LexerItem = Result<Token, LexerError>;
+use token::Token;
+
+pub type Location = usize;
+pub type LexerItem = Result<(Location, Token, Location), LexerError>;
 
 pub struct Lexer<'a> {
-    input: Peekable<Chars<'a>>,
+    chars: CharIndices<'a>,
+    lookahead: Option<(usize, char)>,
 }
 
 impl<'a> Lexer<'a> {
 	pub fn new(input: &str) -> Lexer {
-        Lexer { input: input.chars().peekable() }
+        let mut chars = input.char_indices();
+        let lookahead = chars.next();
+
+        Lexer { chars: chars, lookahead: lookahead }
     }
 
-    fn read_char(&mut self) -> Option<char> {
-        self.input.next()
+    fn read_char(&mut self) -> Option<(usize, char)> {
+        mem::replace(&mut self.lookahead, self.chars.next())
     }
 
-    fn peek_char(&mut self) -> Option<&char> {
-        self.input.peek()
+    fn peek_char(&mut self) -> Option<(usize, char)> {
+        self.lookahead
     }
 
     fn peek_char_eq(&mut self, ch: char) -> bool {
         match self.peek_char() {
-            Some(&peek_ch) => peek_ch == ch,
+            Some((_, peek_ch)) => peek_ch == ch,
             None => false,
         }
     }
@@ -33,48 +39,59 @@ impl<'a> Lexer<'a> {
         ch.is_alphabetic() || ch == '_'
     }
 
-    fn peek_is_letter(&mut self) -> bool {
-        match self.peek_char() {
-            Some(&ch) => self.is_letter(ch),
-            None => false,
-        }
-    }
-
     fn is_number(&mut self, ch: char) -> bool {
         ch.is_numeric()
     }
 
-    fn peek_is_number(&mut self) -> bool {
-        match self.peek_char() {
-            Some(&ch) => self.is_number(ch),
-            None => false,
-        }
-    }
-
-    fn read_identifier(&mut self, first: char) -> String {
+    fn read_identifier(&mut self, start: usize, first: char) -> (usize, Token, usize) {
         let mut ident = String::new();
+        let mut end = start;
         ident.push(first);
 
-        while self.peek_is_letter() || self.peek_is_number() {
-            ident.push(self.read_char().unwrap()); // TODO: unwrap()
+        while let Some((_, ch)) = self.peek_char() {
+            if self.is_letter(ch) || self.is_number(ch) {
+                if let Some((i, ch)) = self.read_char() {
+                    ident.push(ch);
+                    end = i;
+                }
+            } else {
+                break;
+            }
         }
 
-        ident
+        let token = match ident.as_str() {
+            "mod" => Token::Mod,
+            "top" => Token::Top,
+            "in" => Token::In,
+            "out" => Token::Out,
+            "bit" => Token::Bit,
+            _ => Token::Ident(ident.to_string()),
+        };
+
+        (start, token, end + 1)
     }
 
-    fn read_number(&mut self, first: char) -> String {
+    fn read_number(&mut self, start: usize, first: char) -> (usize, Token, usize) {
         let mut number = String::new();
+        let mut end = start;
         number.push(first);
 
-        while self.peek_is_number() {
-            number.push(self.read_char().unwrap()); // TODO: unwrap()
+        while let Some((_, ch)) = self.peek_char() {
+            if self.is_number(ch) {
+                if let Some((i, ch)) = self.read_char() {
+                    number.push(ch);
+                    end = i;
+                }
+            } else {
+                break;
+            }
         }
 
-        number
+        (start, Token::Litrl(number), end + 1)
     }
 
     fn skip_whitespace(&mut self) {
-        while let Some(&ch) = self.peek_char() {
+        while let Some((_, ch)) = self.peek_char() {
             if !ch.is_whitespace() {
                 break;
             }
@@ -96,55 +113,56 @@ impl<'a> Iterator for Lexer<'a> {
 
         self.skip_whitespace();
 
-        match self.read_char() {
-            Some(',') => Some(Ok(Token::Comma)),
-            Some(';') => Some(Ok(Token::Semicolon)),
-            Some(':') => Some(Ok(Token::Colon)),
-            Some('(') => Some(Ok(Token::LeftParen)),
-            Some(')') => Some(Ok(Token::RightParen)),
-            Some('{') => Some(Ok(Token::LeftCurlyBrace)),
-            Some('}') => Some(Ok(Token::RightCurlyBrace)),
-            Some('=') => Some(Ok(Token::Assign)),
-            Some('~') => Some(Ok(Token::Negate)),
-            Some('&') => Some(Ok(Token::BitAnd)),
-            Some('|') => Some(Ok(Token::BitOr)),
-            Some('^') => Some(Ok(Token::BitXor)),
-            Some('<') => { 
-                if self.peek_char_eq('<') {
-                    self.read_char();
-                    Some(Ok(Token::ShiftLeft))
-                } else {
-                    Some(Err(LexerError::InvalidCharacter('<')))
+        if let Some((i, ch)) = self.read_char() {
+            match ch {
+                ',' => Some(Ok((i, Token::Comma, i + 1))),
+                ';' => Some(Ok((i, Token::Semicolon, i + 1))),
+                ':' => Some(Ok((i, Token::Colon, i + 1))),
+                '(' => Some(Ok((i, Token::LeftParen, i + 1))),
+                ')' => Some(Ok((i, Token::RightParen, i + 1))),
+                '{' => Some(Ok((i, Token::LeftCurlyBrace, i + 1))),
+                '}' => Some(Ok((i, Token::RightCurlyBrace, i + 1))),
+                '=' => Some(Ok((i, Token::Assign, i + 1))),
+                '~' => Some(Ok((i, Token::Negate, i + 1))),
+                '&' => Some(Ok((i, Token::BitAnd, i + 1))),
+                '|' => Some(Ok((i, Token::BitOr, i + 1))),
+                '^' => Some(Ok((i, Token::BitXor, i + 1))),
+                '<' => { 
+                    if self.peek_char_eq('<') {
+                        self.read_char();
+                        Some(Ok((i, Token::ShiftLeft, i + 2)))
+                    } else {
+                        Some(Err(LexerError::InvalidCharacter('<')))
+                    }
+                }
+                '>' => { 
+                    if self.peek_char_eq('>') {
+                        self.read_char();
+                        Some(Ok((i, Token::ShiftRight, i + 2)))
+                    } else {
+                        Some(Err(LexerError::InvalidCharacter('>')))
+                    }
+                }
+                '/' => {
+                    if self.peek_char_eq('/') {
+                        self.skip_line();
+                        self.next()
+                    } else {
+                        Some(Err(LexerError::InvalidCharacter('/')))
+                    }
+                }
+                ch @ _ => {
+                    if self.is_letter(ch) {
+                        Some(Ok(self.read_identifier(i, ch)))
+                    } else if self.is_number(ch) {
+                        Some(Ok(self.read_number(i, ch)))
+                    } else {
+                        Some(Err(LexerError::InvalidCharacter(ch)))
+                    }
                 }
             }
-            Some('>') => { 
-                if self.peek_char_eq('>') {
-                    self.read_char();
-                    Some(Ok(Token::ShiftRight))
-                } else {
-                    Some(Err(LexerError::InvalidCharacter('>')))
-                }
-            }
-            Some('/') => {
-                if self.peek_char_eq('/') {
-                    self.skip_line();
-                    self.next()
-                } else {
-                    Some(Err(LexerError::InvalidCharacter('/')))
-                }
-            }
-            Some(ch @ _) => {
-                if self.is_letter(ch) {
-                    let ident = self.read_identifier(ch);
-                    Some(Ok(token::lookup_ident(&ident)))
-                } else if self.is_number(ch) {
-                    let num = self.read_number(ch);
-                    Some(Ok(Token::Litrl(num)))
-                } else {
-                    Some(Err(LexerError::InvalidCharacter(ch)))
-                }
-            }
-            None => None,
+        } else {
+            None
         }
     }
 }
@@ -170,13 +188,13 @@ mod test {
     #[test]
     fn identifiers() {
         assert_lex(
-            "id _id id123 modu mo ",
+            "id _id id123 modu mo",
             vec![
-                Ok(Token::Ident("id".to_string())),
-                Ok(Token::Ident("_id".to_string())),
-                Ok(Token::Ident("id123".to_string())),
-                Ok(Token::Ident("modu".to_string())),
-                Ok(Token::Ident("mo".to_string())),
+                Ok((0, Token::Ident("id".to_string()), 2)),
+                Ok((3, Token::Ident("_id".to_string()), 6)),
+                Ok((7, Token::Ident("id123".to_string()), 12)),
+                Ok((13, Token::Ident("modu".to_string()), 17)),
+                Ok((18, Token::Ident("mo".to_string()), 20)),
             ]
         );
     }
@@ -184,10 +202,10 @@ mod test {
     #[test]
     fn literal() {
         assert_lex(
-            " 1 0123 ",
+            "1 0123",
             vec![
-                Ok(Token::Litrl("1".to_string())),
-                Ok(Token::Litrl("0123".to_string())),
+                Ok((0, Token::Litrl("1".to_string()), 1)),
+                Ok((2, Token::Litrl("0123".to_string()), 6)),
             ]
         );
     }
@@ -195,10 +213,10 @@ mod test {
     #[test]
     fn comments() {
         assert_lex(
-            " top // this shouldn't be seen \n mod ",
+            "top // this shouldn't be seen \n mod",
             vec![
-                Ok(Token::Top),
-                Ok(Token::Mod),
+                Ok((0, Token::Top, 3)),
+                Ok((32, Token::Mod, 35)),
             ]
         );
     }
@@ -206,13 +224,13 @@ mod test {
     #[test]
     fn keywords() {
         assert_lex(
-            " mod top in out bit ",
+            "mod top in out bit",
             vec![
-                Ok(Token::Mod),
-                Ok(Token::Top),
-                Ok(Token::In),
-                Ok(Token::Out),
-                Ok(Token::Bit),
+                Ok((0, Token::Mod, 3)),
+                Ok((4, Token::Top, 7)),
+                Ok((8, Token::In, 10)),
+                Ok((11, Token::Out, 14)),
+                Ok((15, Token::Bit, 18)),
             ]
         );
     }
@@ -220,15 +238,15 @@ mod test {
     #[test]
     fn operators() {
         assert_lex(
-            " = ~ & | ^ << >> ",
+            "= ~ & | ^ << >>",
             vec![
-                Ok(Token::Assign),
-                Ok(Token::Negate),
-                Ok(Token::BitAnd),
-                Ok(Token::BitOr),
-                Ok(Token::BitXor),
-                Ok(Token::ShiftLeft),
-                Ok(Token::ShiftRight),
+                Ok((0, Token::Assign, 1)),
+                Ok((2, Token::Negate, 3)),
+                Ok((4, Token::BitAnd, 5)),
+                Ok((6, Token::BitOr, 7)),
+                Ok((8, Token::BitXor, 9)),
+                Ok((10, Token::ShiftLeft, 12)),
+                Ok((13, Token::ShiftRight, 15)),
             ]
         );
     }
@@ -236,15 +254,15 @@ mod test {
     #[test]
     fn punctuation() {
         assert_lex(
-            " , ; : ( ) { } ",
+            ", ; : ( ) { }",
             vec![
-                Ok(Token::Comma),
-                Ok(Token::Semicolon),
-                Ok(Token::Colon),
-                Ok(Token::LeftParen),
-                Ok(Token::RightParen),
-                Ok(Token::LeftCurlyBrace),
-                Ok(Token::RightCurlyBrace),
+                Ok((0, Token::Comma, 1)),
+                Ok((2, Token::Semicolon, 3)),
+                Ok((4, Token::Colon, 5)),
+                Ok((6, Token::LeftParen, 7)),
+                Ok((8, Token::RightParen, 9)),
+                Ok((10, Token::LeftCurlyBrace, 11)),
+                Ok((12, Token::RightCurlyBrace, 13)),
             ]
         );
     }

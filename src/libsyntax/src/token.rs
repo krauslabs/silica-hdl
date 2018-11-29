@@ -30,14 +30,3 @@ pub enum Token {
 	Out,
 	Bit,
 }
-
-pub fn lookup_ident(ident: &str) -> Token {
-    match ident {
-        "mod" => Token::Mod,
-        "top" => Token::Top,
-        "in" => Token::In,
-        "out" => Token::Out,
-        "bit" => Token::Bit,
-        _ => Token::Ident(ident.to_string()),
-    }
-}
