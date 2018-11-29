@@ -1,5 +1,7 @@
 use ast::*;
 use super::Ast;
+use token::Token;
+use lexer::LexerError;
 
 grammar;
 
@@ -70,11 +72,11 @@ ExprTerm: Expr = {
 // Other Terminals
 
 Ident: Ident = {
-    r"[a-zA-Z][0-9A-Za-z_]*" => Ident(<>.to_string()),
+    "ident" => Ident(<>.to_string()),
 };
 
 Litrl: Litrl = {
-    r"[0-9]+" => Litrl(<>.to_string()),
+    "litrl" => Litrl(<>.to_string()),
 };
 
 // Helper Macros
@@ -89,3 +91,43 @@ Comma<T>: Vec<T> = {
         }
     }
 };
+
+// Custom Lexer
+
+extern {
+    type Location = usize;
+    type Error = LexerError;
+
+    enum Token {
+        // Identifiers
+        "ident" => Token::Ident(<String>),
+
+        // Literals
+        "litrl" => Token::Litrl(<String>),
+
+        // Punctuation
+        "," => Token::Comma,
+        ";" => Token::Semicolon,
+        ":" => Token::Colon,
+        "(" => Token::LeftParen,
+        ")" => Token::RightParen,
+        "{" => Token::LeftCurlyBrace,
+        "}" => Token::RightCurlyBrace,
+
+        // Operators
+        "=" => Token::Assign,
+        "~" => Token::Negate,
+        "&" => Token::BitAnd,
+        "|" => Token::BitOr,
+        "^" => Token::BitXor,
+        "<<" => Token::ShiftLeft,
+        ">>" => Token::ShiftRight,
+
+        // Keywords
+        "mod" => Token::Mod,
+        "top" => Token::Top,
+        "in" => Token::In,
+        "out" => Token::Out,
+        "bit" => Token::Bit,
+    }
+}

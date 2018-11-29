@@ -2,7 +2,10 @@
 #[derive(Clone, Debug, PartialEq)]
 pub enum Token {
 
+	// Identifiers
 	Ident(String),
+
+	// Literals
 	Litrl(String),
 
 	// Punctuation

@@ -28,15 +28,9 @@ pub struct Ast {
 
 impl Ast {
 	pub fn new(input: &str) -> Ast {
+		
+		let lexer = lexer::Lexer::new(input);
 
-		// strip the input of all comments before returning the struct
-		//
-		// TODO: implement this in lalrpop grammar when possible, comments
-		// stripped here cause byte indices of 'input' to not match the
-		// actual file that they are taken from.
-		let re = regex::Regex::new(r"//.*").unwrap();
-		let input_stripped = re.replace_all(input, "");
-
-		grammar::SourceFileParser::new().parse(&input_stripped).unwrap()
+		grammar::SourceFileParser::new().parse(lexer).unwrap()
 	}
 }
