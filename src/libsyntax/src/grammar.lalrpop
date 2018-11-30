@@ -1,7 +1,6 @@
+use Ast;
 use ast::*;
-use super::Ast;
-use token::Token;
-use lexer::LexerError;
+use lexer::{LexerError, Token};
 
 grammar;
 

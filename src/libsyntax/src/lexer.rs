@@ -2,7 +2,40 @@
 use std::mem;
 use std::str::CharIndices;
 
-use token::Token;
+#[derive(Clone, Debug, PartialEq)]
+pub enum Token {
+
+    // Identifiers
+    Ident(String),
+
+    // Literals
+    Litrl(String),
+
+    // Punctuation
+    Comma,
+    Semicolon,
+    Colon,
+    LeftParen,
+    RightParen,
+    LeftCurlyBrace,
+    RightCurlyBrace,
+
+    // Operators
+    Assign,
+    Negate,
+    BitAnd,
+    BitOr,
+    BitXor,
+    ShiftLeft,
+    ShiftRight,
+
+    // Keywords
+    Mod,
+    Top,
+    In,
+    Out,
+    Bit,
+}
 
 pub type Location = usize;
 pub type LexerItem = Result<(Location, Token, Location), LexerError>;
@@ -132,7 +165,7 @@ impl<'a> Iterator for Lexer<'a> {
                         self.read_char();
                         Some(Ok((i, Token::ShiftLeft, i + 2)))
                     } else {
-                        Some(Err(LexerError::InvalidCharacter('<')))
+                        Some(Err(LexerError::InvalidCharacter{ ch: '<', pos: i }))
                     }
                 }
                 '>' => { 
@@ -140,7 +173,7 @@ impl<'a> Iterator for Lexer<'a> {
                         self.read_char();
                         Some(Ok((i, Token::ShiftRight, i + 2)))
                     } else {
-                        Some(Err(LexerError::InvalidCharacter('>')))
+                        Some(Err(LexerError::InvalidCharacter{ ch: '>', pos: i }))
                     }
                 }
                 '/' => {
@@ -148,7 +181,7 @@ impl<'a> Iterator for Lexer<'a> {
                         self.skip_line();
                         self.next()
                     } else {
-                        Some(Err(LexerError::InvalidCharacter('/')))
+                        Some(Err(LexerError::InvalidCharacter{ ch: '/', pos: i }))
                     }
                 }
                 ch @ _ => {
@@ -157,7 +190,7 @@ impl<'a> Iterator for Lexer<'a> {
                     } else if self.is_number(ch) {
                         Some(Ok(self.read_number(i, ch)))
                     } else {
-                        Some(Err(LexerError::InvalidCharacter(ch)))
+                        Some(Err(LexerError::InvalidCharacter{ ch: ch, pos: i }))
                     }
                 }
             }
@@ -169,7 +202,7 @@ impl<'a> Iterator for Lexer<'a> {
 
 #[derive(Debug, PartialEq)]
 pub enum LexerError {
-    InvalidCharacter(char),
+    InvalidCharacter{ ch: char, pos: usize },
 }
 
 #[cfg(test)]
