@@ -32,3 +32,34 @@ impl Ast {
 		grammar::SourceFileParser::new().parse(lexer).unwrap()
 	}
 }
+
+#[cfg(test)]
+mod test {
+
+	use super::*;
+
+	#[test]
+	fn trailing_comma() {
+
+	    let no_comma = 
+	        "top mod a (
+	            in x: bit,
+	            out y: bit
+	        ) {
+	            y = x;
+	        }";
+
+	    let comma = 
+	        "top mod a (
+	            in x: bit,
+	            out y: bit,
+	        ) {
+	            y = x;
+	        }";
+
+	    let ast_no_comma = Ast::new(no_comma);
+	    let ast_comma = Ast::new(comma);
+
+	    assert_eq!(ast_comma, ast_no_comma);
+	}
+}

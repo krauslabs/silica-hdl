@@ -214,7 +214,7 @@ mod test {
         let lexer = Lexer::new(source);
 
         for (idx, item) in lexer.enumerate() {
-            assert_eq!(item, expected[idx])
+            assert_eq!(item, expected[idx]);
         }
     }
 
