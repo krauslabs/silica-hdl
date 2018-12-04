@@ -299,5 +299,17 @@ mod test {
             ]
         );
     }
+
+    #[test]
+    fn error() { 
+        assert_lex(
+            "= ∞ abc",
+            vec![
+                Ok((0, Token::Assign, 1)),
+                Err(LexerError::InvalidCharacter{ ch: '∞', pos: 2}),
+                Ok((6, Token::Ident("abc".to_string()), 9)),
+            ]
+        );
+    }
 }
 
