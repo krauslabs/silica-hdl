@@ -11,14 +11,11 @@ pub trait Visitor: Sized {
 	fn visit_expr(&mut self, e: &Expr) { walk_expr(self, e); }
 	fn visit_unary_op(&mut self, u: &UnaryOp) { walk_unary_op(self, u); }
 	fn visit_binary_op(&mut self, b: &BinaryOp) { walk_binary_op(self, b); }
-	fn visit_ident(&mut self, i: &Ident) { walk_ident(self, i); }
-	fn visit_litrl(&mut self, l: &Litrl) { walk_litrl(self, l); }
 }
 
 pub fn walk_mod<V: Visitor>(visitor: &mut V, m: &Mod) {
 	let Mod(id, ports, stmts) = m;
 
-	visitor.visit_ident(id);
 	for port in ports {
 		visitor.visit_port(port);
 	}
@@ -31,7 +28,6 @@ pub fn walk_port<V: Visitor>(visitor: &mut V, p: &Port) {
 	let Port(dir, id, ty) = p;
 
 	visitor.visit_dir(dir);
-	visitor.visit_ident(id);
 	visitor.visit_type(ty);
 }
 
@@ -46,7 +42,6 @@ pub fn walk_type<V: Visitor>(visitor: &mut V, t: &Type) {
 pub fn walk_stmt<V: Visitor>(visitor: &mut V, s: &Stmt) {
 	match s {
 		Stmt::Assign(ref id, ref ex) => {
-			visitor.visit_ident(id);
 			visitor.visit_expr(ex);
 		}
 	}
@@ -67,10 +62,8 @@ pub fn walk_expr<V: Visitor>(visitor: &mut V, e: &Expr) {
 			visitor.visit_expr(ex);
 		}
 		Expr::Ident(ref id) => {
-			visitor.visit_ident(id);
 		}
 		Expr::Litrl(ref lit) => {
-			visitor.visit_litrl(lit);
 		}
 	}
 }
@@ -80,13 +73,5 @@ pub fn walk_unary_op<V: Visitor>(visitor: &mut V, u: &UnaryOp) {
 }
 
 pub fn walk_binary_op<V: Visitor>(visitor: &mut V, b: &BinaryOp) {
-	
-}
-
-pub fn walk_ident<V: Visitor>(visitor: &mut V, i: &Ident) {
-	
-}
-
-pub fn walk_litrl<V: Visitor>(visitor: &mut V, l: &Litrl) {
 	
 }

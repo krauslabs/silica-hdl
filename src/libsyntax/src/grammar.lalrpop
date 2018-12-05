@@ -70,12 +70,12 @@ ExprTerm: Expr = {
 
 // Other Terminals
 
-Ident: Ident = {
-    "ident" => Ident(<>.to_string()),
+Ident: String = {
+    "ident" => <>.to_string(),
 };
 
-Litrl: Litrl = {
-    "litrl" => Litrl(<>.to_string()),
+Litrl: String = {
+    "litrl" => <>.to_string(),
 };
 
 // Helper Macros

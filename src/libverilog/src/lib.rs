@@ -30,9 +30,7 @@ impl Visitor for Verilog {
 	fn visit_mod(&mut self, m: &Mod) {
 		let Mod(id, ports, stmts) = m;
 
-		self.verilog.push_str("module ");
-		self.visit_ident(id);
-		self.verilog.push_str(" ( \n");
+		self.verilog.push_str(format!("module {} ( \n", id).as_str());
 
 		let port_len = ports.len();
 		for (idx, port) in ports.iter().enumerate() {
@@ -62,7 +60,7 @@ impl Visitor for Verilog {
 		self.verilog.push_str(" ");
 		self.visit_type(ty);
 		self.verilog.push_str(" ");
-		self.visit_ident(id);
+		self.verilog.push_str(id);
 	}
 
 	fn visit_dir(&mut self, d: &Dir) {
@@ -88,7 +86,7 @@ impl Visitor for Verilog {
 		match s {
 			Stmt::Assign(ref id, ref ex) => {
 				self.verilog.push_str("assign ");
-				self.visit_ident(id);
+				self.verilog.push_str(id);
 				self.verilog.push_str(" = ");
 				self.visit_expr(ex);
 				self.verilog.push_str(";");
@@ -115,10 +113,10 @@ impl Visitor for Verilog {
 				self.verilog.push_str(" )");
 			}
 			Expr::Ident(ref id) => {
-				self.visit_ident(id);
+				self.verilog.push_str(id);
 			}
 			Expr::Litrl(ref lit) => {
-				self.visit_litrl(lit);
+				self.verilog.push_str(lit);
 			}
 		}
 	}
@@ -158,16 +156,6 @@ impl Visitor for Verilog {
 				self.verilog.push_str("|");
 			}
 		}
-	}
-
-	fn visit_ident(&mut self, i: &Ident) {
-		let Ident(s) = i;
-		self.verilog.push_str(s);
-	}
-
-	fn visit_litrl(&mut self, l: &Litrl) {
-		let Litrl(s) = l;
-		self.verilog.push_str(s);
 	}
 }
 
