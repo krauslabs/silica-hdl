@@ -14,7 +14,7 @@ pub trait Visitor: Sized {
 }
 
 pub fn walk_mod<V: Visitor>(visitor: &mut V, m: &Mod) {
-	let Mod(id, ports, stmts) = m;
+	let Mod{name, ports, stmts} = m;
 
 	for port in ports {
 		visitor.visit_port(port);
@@ -25,7 +25,7 @@ pub fn walk_mod<V: Visitor>(visitor: &mut V, m: &Mod) {
 }
 
 pub fn walk_port<V: Visitor>(visitor: &mut V, p: &Port) {
-	let Port(dir, id, ty) = p;
+	let Port{dir, name, ty} = p;
 
 	visitor.visit_dir(dir);
 	visitor.visit_type(ty);
@@ -41,7 +41,7 @@ pub fn walk_type<V: Visitor>(visitor: &mut V, t: &Type) {
 
 pub fn walk_stmt<V: Visitor>(visitor: &mut V, s: &Stmt) {
 	match s {
-		Stmt::Assign(ref id, ref ex) => {
+		Stmt::Assign{id, ex} => {
 			visitor.visit_expr(ex);
 		}
 	}
@@ -50,20 +50,20 @@ pub fn walk_stmt<V: Visitor>(visitor: &mut V, s: &Stmt) {
 pub fn walk_expr<V: Visitor>(visitor: &mut V, e: &Expr) {
 	match e {
 
-		Expr::Binary(ref ex1, ref op, ref ex2) => {
-			visitor.visit_expr(ex1);
+		Expr::Binary{lex, op, rex} => {
+			visitor.visit_expr(lex);
 			visitor.visit_binary_op(op);
-			visitor.visit_expr(ex2);
+			visitor.visit_expr(rex);
 		}
-		Expr::Unary(ref op, ref ex) => {
+		Expr::Unary{op, ex} => {
 			visitor.visit_unary_op(op);
 		}
-		Expr::Paren(ref ex) => {
+		Expr::Paren{ex} => {
 			visitor.visit_expr(ex);
 		}
-		Expr::Ident(ref id) => {
+		Expr::Ident{id} => {
 		}
-		Expr::Litrl(ref lit) => {
+		Expr::Litrl{val} => {
 		}
 	}
 }

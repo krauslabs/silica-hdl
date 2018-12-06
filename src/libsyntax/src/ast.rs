@@ -1,9 +1,17 @@
 
 #[derive(Clone, Debug, PartialEq)]
-pub struct Mod(pub String, pub Vec<Port>, pub Vec<Stmt>);
+pub struct Mod {
+	pub name: String,
+	pub ports: Vec<Port>,
+	pub stmts: Vec<Stmt>,
+}
 
 #[derive(Clone, Debug, PartialEq)]
-pub struct Port(pub Dir, pub String, pub Type);
+pub struct Port {
+	pub dir: Dir, 
+	pub name: String, 
+	pub ty: Type,
+}
 
 #[derive(Clone, Debug, PartialEq)]
 pub enum Dir {
@@ -18,16 +26,16 @@ pub enum Type {
 
 #[derive(Clone, Debug, PartialEq)]
 pub enum Stmt {
-	Assign(String, Expr),
+	Assign{id: String, ex: Expr},
 }
 
 #[derive(Clone, Debug, PartialEq)]
 pub enum Expr {
-	Binary(Box<Expr>, BinaryOp, Box<Expr>),
-	Unary(UnaryOp, Box<Expr>),
-	Paren(Box<Expr>),
-	Ident(String),
-	Litrl(String),
+	Binary{lex: Box<Expr>, op: BinaryOp, rex: Box<Expr>},
+	Unary{op: UnaryOp, ex: Box<Expr>},
+	Paren{ex: Box<Expr>},
+	Ident{id: String},
+	Litrl{val: String},
 }
 
 #[derive(Clone, Debug, PartialEq)]

@@ -9,14 +9,14 @@ pub SourceFile: Ast = {
 };
 
 Mod: Mod = {
-    "mod" <id:Ident> "(" <ports:Ports> ")" "{" <stmts:Stmt*> "}" => Mod(id, ports, stmts),
+    "mod" <name:Ident> "(" <ports:Ports> ")" "{" <stmts:Stmt*> "}" => Mod{name, ports, stmts},
 };
 
 Ports: Vec<Port> = Comma<Port>;
 
 Port: Port = {
-    "in" <id:Ident> ":" <ty:Type> => Port(Dir::Input, id, ty),
-    "out" <id:Ident> ":" <ty:Type> => Port(Dir::Output, id, ty),
+    "in" <name:Ident> ":" <ty:Type> => Port{dir: Dir::Input, name, ty},
+    "out" <name:Ident> ":" <ty:Type> => Port{dir: Dir::Output, name, ty},
 };
 
 Type: Type = {
@@ -26,7 +26,7 @@ Type: Type = {
 // Statements
 
 Stmt: Stmt = {
-    <id:Ident> "=" <ex:Expr> ";" => Stmt::Assign(id, ex),
+    <id:Ident> "=" <ex:Expr> ";" => Stmt::Assign{id, ex},
 };
 
 // Expressions
@@ -34,38 +34,38 @@ Stmt: Stmt = {
 Expr: Expr = ExprBitOr;
 
 ExprBitOr: Expr = {
-    <l:ExprBitOr> "|" <r:ExprBitXor> => Expr::Binary(Box::new(l), BinaryOp::BitOr, Box::new(r)),
+    <lex:ExprBitOr> "|" <rex:ExprBitXor> => Expr::Binary{lex: Box::new(lex), op: BinaryOp::BitOr, rex: Box::new(rex)},
     ExprBitXor,
 };
 
 ExprBitXor: Expr = {
-    <l:ExprBitXor> "^" <r:ExprBitAnd> => Expr::Binary(Box::new(l), BinaryOp::BitXor, Box::new(r)),
+    <lex:ExprBitXor> "^" <rex:ExprBitAnd> => Expr::Binary{lex: Box::new(lex), op: BinaryOp::BitXor, rex: Box::new(rex)},
     ExprBitAnd,
 };
 
 ExprBitAnd: Expr = {
-    <l:ExprBitAnd> "&" <r:ExprShift> => Expr::Binary(Box::new(l), BinaryOp::BitAnd, Box::new(r)),
+    <lex:ExprBitAnd> "&" <rex:ExprShift> => Expr::Binary{lex: Box::new(lex), op: BinaryOp::BitAnd, rex: Box::new(rex)},
     ExprShift,
 };
 
 ExprShift: Expr = {
-    <l:ExprShift> "<<" <r:ExprUnary> => Expr::Binary(Box::new(l), BinaryOp::ShiftLeft, Box::new(r)),
-    <l:ExprShift> ">>" <r:ExprUnary> => Expr::Binary(Box::new(l), BinaryOp::ShiftRight, Box::new(r)),
+    <lex:ExprShift> "<<" <rex:ExprUnary> => Expr::Binary{lex: Box::new(lex), op: BinaryOp::ShiftLeft, rex: Box::new(rex)},
+    <lex:ExprShift> ">>" <rex:ExprUnary> => Expr::Binary{lex: Box::new(lex), op: BinaryOp::ShiftRight, rex: Box::new(rex)},
     ExprUnary,
 };
 
 ExprUnary: Expr = {
-    "~" <ex:ExprUnary> => Expr::Unary(UnaryOp::Negate, Box::new(ex)),
-    "&" <ex:ExprUnary> => Expr::Unary(UnaryOp::ReductAnd, Box::new(ex)),
-    "^" <ex:ExprUnary> => Expr::Unary(UnaryOp::ReductXor, Box::new(ex)),
-    "|" <ex:ExprUnary> => Expr::Unary(UnaryOp::ReductOr, Box::new(ex)),
+    "~" <ex:ExprUnary> => Expr::Unary{op: UnaryOp::Negate, ex: Box::new(ex)},
+    "&" <ex:ExprUnary> => Expr::Unary{op: UnaryOp::ReductAnd, ex: Box::new(ex)},
+    "^" <ex:ExprUnary> => Expr::Unary{op: UnaryOp::ReductXor, ex: Box::new(ex)},
+    "|" <ex:ExprUnary> => Expr::Unary{op: UnaryOp::ReductOr, ex: Box::new(ex)},
     ExprTerm,
 };
 
 ExprTerm: Expr = {
-    "(" <ex:Expr> ")" => Expr::Paren(Box::new(ex)),
-    <id:Ident> => Expr::Ident(id),
-    <lit:Litrl> => Expr::Litrl(lit),
+    "(" <ex:Expr> ")" => Expr::Paren{ex: Box::new(ex)},
+    <id:Ident> => Expr::Ident{id},
+    <val:Litrl> => Expr::Litrl{val},
 };
 
 // Other Terminals

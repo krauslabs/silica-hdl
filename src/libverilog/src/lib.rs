@@ -28,9 +28,9 @@ impl Verilog {
 impl Visitor for Verilog {
 
 	fn visit_mod(&mut self, m: &Mod) {
-		let Mod(id, ports, stmts) = m;
+		let Mod{name, ports, stmts} = m;
 
-		self.verilog.push_str(format!("module {} ( \n", id).as_str());
+		self.verilog.push_str(format!("module {} ( \n", name).as_str());
 
 		let port_len = ports.len();
 		for (idx, port) in ports.iter().enumerate() {
@@ -55,12 +55,12 @@ impl Visitor for Verilog {
 	}
 
 	fn visit_port(&mut self, p: &Port) {
-		let Port(dir, id, ty) = p;
+		let Port{dir, name, ty} = p;
 		self.visit_dir(dir);
 		self.verilog.push_str(" ");
 		self.visit_type(ty);
 		self.verilog.push_str(" ");
-		self.verilog.push_str(id);
+		self.verilog.push_str(name);
 	}
 
 	fn visit_dir(&mut self, d: &Dir) {
@@ -84,7 +84,7 @@ impl Visitor for Verilog {
 
 	fn visit_stmt(&mut self, s: &Stmt) {
 		match s {
-			Stmt::Assign(ref id, ref ex) => {
+			Stmt::Assign{id, ex} => {
 				self.verilog.push_str("assign ");
 				self.verilog.push_str(id);
 				self.verilog.push_str(" = ");
@@ -96,27 +96,27 @@ impl Visitor for Verilog {
 
 	fn visit_expr(&mut self, e: &Expr) {
 		match e {
-			Expr::Binary(ref ex1, ref op, ref ex2) => {
-				self.visit_expr(ex1);
+			Expr::Binary{lex, op, rex} => {
+				self.visit_expr(lex);
 				self.verilog.push_str(" ");
 				self.visit_binary_op(op);
 				self.verilog.push_str(" ");
-				self.visit_expr(ex2);
+				self.visit_expr(rex);
 			}
-			Expr::Unary(ref op, ref ex) => {
+			Expr::Unary{op, ex} => {
 				self.visit_unary_op(op);
 				self.visit_expr(ex);
 			}
-			Expr::Paren(ref ex) => {
+			Expr::Paren{ex} => {
 				self.verilog.push_str("( ");
 				self.visit_expr(ex);
 				self.verilog.push_str(" )");
 			}
-			Expr::Ident(ref id) => {
+			Expr::Ident{id} => {
 				self.verilog.push_str(id);
 			}
-			Expr::Litrl(ref lit) => {
-				self.verilog.push_str(lit);
+			Expr::Litrl{val} => {
+				self.verilog.push_str(val);
 			}
 		}
 	}
