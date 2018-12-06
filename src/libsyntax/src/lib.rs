@@ -53,14 +53,25 @@ mod test {
  	#[test]
  	fn precedence() {
  		assert_expr(
- 			"1 | 2 << 3",
+ 			"1 | 2 ^ 3 & & 4 << 5",
  			&Expr::Binary{
  				lex: Box::new(Expr::Litrl{val: "1".to_string()}),
  				op: BinaryOp::BitOr,
  				rex: Box::new(Expr::Binary{
  					lex: Box::new(Expr::Litrl{val: "2".to_string()}),
- 					op: BinaryOp::ShiftLeft,
- 					rex: Box::new(Expr::Litrl{val: "3".to_string()}),
+ 					op: BinaryOp::BitXor,
+ 					rex: Box::new(Expr::Binary{
+ 						lex: Box::new(Expr::Litrl{val: "3".to_string()}),
+ 						op: BinaryOp::BitAnd,
+ 						rex: Box::new(Expr::Binary{
+ 							lex: Box::new(Expr::Unary{
+ 								op: UnaryOp::ReductAnd,
+ 								ex: Box::new(Expr::Litrl{val: "4".to_string()})
+ 							}),
+ 							op: BinaryOp::ShiftLeft,
+ 							rex: Box::new(Expr::Litrl{val: "5".to_string()}),
+ 						}),
+ 					}),
  				}),
  			}
  		);
