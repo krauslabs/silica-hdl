@@ -2,6 +2,7 @@
 name = "verilog"
 version = "0.0.0"
 authors = ["Nick Kraus <nick@krauslabs.com>"]
+edition = "2018"
 
 [lib]
 name = "verilog"
