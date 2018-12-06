@@ -37,6 +37,34 @@ impl Ast {
 mod test {
 
 	use super::*;
+	use ast::*;
+
+	fn assert_expr(source: &str, expected: &Expr) {
+		let module = format!("top mod a ( out y: bit ) {{ y = {}; }}", source);
+
+		let ast = Ast::new(&module);
+		let expr = match ast.top.stmts[0] {
+			Stmt::Assign{id: _, ref ex} => ex,
+		};
+
+		assert_eq!(expr, expected);
+	}
+
+ 	#[test]
+ 	fn precedence() {
+ 		assert_expr(
+ 			"1 | 2 << 3",
+ 			&Expr::Binary{
+ 				lex: Box::new(Expr::Litrl{val: "1".to_string()}),
+ 				op: BinaryOp::BitOr,
+ 				rex: Box::new(Expr::Binary{
+ 					lex: Box::new(Expr::Litrl{val: "2".to_string()}),
+ 					op: BinaryOp::ShiftLeft,
+ 					rex: Box::new(Expr::Litrl{val: "3".to_string()}),
+ 				}),
+ 			}
+ 		);
+ 	}
 
 	#[test]
 	fn trailing_comma() {
