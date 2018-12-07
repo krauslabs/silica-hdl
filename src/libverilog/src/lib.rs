@@ -89,6 +89,12 @@ impl Visitor for Verilog {
 				self.visit_expr(ex);
 				self.verilog.push_str(";");
 			}
+			Stmt::Declare{id, ty} => {
+				self.visit_type(ty);
+				self.verilog.push_str(" ");
+				self.verilog.push_str(id);
+				self.verilog.push_str(";");
+			}
 		}
 	}
 
