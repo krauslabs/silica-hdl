@@ -1,12 +1,23 @@
 language: rust
+
 script:
   - cargo test --verbose --all
+
 rust:
   - stable
   - beta
   - nightly
+
 cache: cargo
+
 matrix:
+
   allow_failures:
     - rust: nightly
+
   fast_finish: true
+
+branches:
+
+  only:
+    - master
