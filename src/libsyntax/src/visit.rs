@@ -44,6 +44,12 @@ pub fn walk_stmt<V: Visitor>(visitor: &mut V, s: &Stmt) {
 		Stmt::Assign{id, ex} => {
 			visitor.visit_expr(ex);
 		}
+		Stmt::Declare{id, ty, ex} => {
+			if let Some(t) = ty {
+				visitor.visit_type(t);
+			}
+			visitor.visit_expr(ex);
+		}
 	}
 }
 

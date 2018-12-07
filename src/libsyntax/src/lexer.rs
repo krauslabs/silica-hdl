@@ -35,6 +35,7 @@ pub enum Token {
     In,
     Out,
     Bit,
+    Let,
 }
 
 pub type Location = usize;
@@ -98,6 +99,7 @@ impl<'a> Lexer<'a> {
             "in" => Token::In,
             "out" => Token::Out,
             "bit" => Token::Bit,
+            "let" => Token::Let,
             _ => Token::Ident(ident.to_string()),
         };
 
@@ -257,13 +259,14 @@ mod test {
     #[test]
     fn keywords() {
         assert_lex(
-            "mod top in out bit",
+            "mod top in out bit let",
             vec![
                 Ok((0, Token::Mod, 3)),
                 Ok((4, Token::Top, 7)),
                 Ok((8, Token::In, 10)),
                 Ok((11, Token::Out, 14)),
                 Ok((15, Token::Bit, 18)),
+                Ok((19, Token::Let, 22)),
             ]
         );
     }

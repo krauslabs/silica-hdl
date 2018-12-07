@@ -14,9 +14,15 @@ Mod: Mod = {
 Ports: Vec<Port> = Comma<Port>;
 
 Port: Port = {
-    "in" <name:Ident> ":" <ty:Type> => Port{dir: Dir::Input, name, ty},
-    "out" <name:Ident> ":" <ty:Type> => Port{dir: Dir::Output, name, ty},
+    // "in" <name:Ident> ":" <ty:Type> => Port{dir: Dir::Input, name, ty},
+    // "out" <name:Ident> ":" <ty:Type> => Port{dir: Dir::Output, name, ty},
+    "in" <name:Ident> <ty:TypeAscription> => Port{dir: Dir::Input, name, ty},
+    "out" <name:Ident> <ty:TypeAscription> => Port{dir: Dir::Output, name, ty},
 };
+
+TypeAscription: Type = {
+    ":" <ty:Type> => ty,
+}
 
 Type: Type = {
     "bit" => Type::Bit,
@@ -26,6 +32,7 @@ Type: Type = {
 
 Stmt: Stmt = {
     <id:Ident> "=" <ex:Expr> ";" => Stmt::Assign{id, ex},
+    "let" <id:Ident> <ty:TypeAscription?> "=" <ex:Expr> ";" => Stmt::Declare{id, ty, ex},
 };
 
 // Expressions
@@ -127,5 +134,6 @@ extern {
         "in" => Token::In,
         "out" => Token::Out,
         "bit" => Token::Bit,
+        "let" => Token::Let,
     }
 }

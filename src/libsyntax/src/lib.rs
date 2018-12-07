@@ -43,6 +43,7 @@ mod test {
 		let ast = Ast::new(&module);
 		let expr = match ast.top.stmts[0] {
 			Stmt::Assign{id: _, ref ex} => ex,
+			_ => panic!(),
 		};
 
 		assert_eq!(expr, expected);

@@ -27,6 +27,7 @@ pub enum Type {
 #[derive(Clone, Debug, PartialEq)]
 pub enum Stmt {
 	Assign{id: String, ex: Expr},
+	Declare{id: String, ty: Option<Type>, ex: Expr},
 }
 
 #[derive(Clone, Debug, PartialEq)]
