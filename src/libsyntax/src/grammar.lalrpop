@@ -31,6 +31,7 @@ Type: Type = {
 Stmt: Stmt = {
     <id:Ident> "=" <ex:Expr> ";" => Stmt::Assign{id, ex},
     "let" <id:Ident> <ty:TypeAscription> ";" => Stmt::Declare{id, ty},
+    "let" <id:Ident> <ty:TypeAscription> "=" <ex:Expr> ";" => Stmt::DeclareAssign{id, ty, ex},
 };
 
 // Expressions

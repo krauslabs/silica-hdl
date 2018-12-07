@@ -47,6 +47,10 @@ pub fn walk_stmt<V: Visitor>(visitor: &mut V, s: &Stmt) {
 		Stmt::Declare{id, ty} => {
 			visitor.visit_type(ty);
 		}
+		Stmt::DeclareAssign{id, ty, ex} => {
+			visitor.visit_type(ty);
+			visitor.visit_expr(ex);
+		}
 	}
 }
 
