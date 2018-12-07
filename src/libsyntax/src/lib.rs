@@ -10,8 +10,7 @@
 //! need to be changed to be something at the 'project' level, whether thats a
 //! specific design or a 'library' or something else is to be determined.
 
-#[macro_use] extern crate lalrpop_util;
-extern crate regex;
+use lalrpop_util::lalrpop_mod;
 
 pub mod ast;
 pub mod visit;
@@ -36,8 +35,7 @@ impl Ast {
 #[cfg(test)]
 mod test {
 
-	use super::*;
-	use ast::*;
+	use crate::{Ast, ast::*};
 
 	fn assert_expr(source: &str, expected: &Expr) {
 		let module = format!("top mod a ( out y: bit ) {{ y = {}; }}", source);

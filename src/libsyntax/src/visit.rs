@@ -1,6 +1,6 @@
 #![allow(unused_variables)]
 
-use ast::*;
+use crate::ast::*;
 
 pub trait Visitor: Sized {
 	fn visit_mod(&mut self, m: &Mod) { walk_mod(self, m); }

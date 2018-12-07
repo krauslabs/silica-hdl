@@ -1,6 +1,5 @@
-use Ast;
-use ast::*;
-use lexer::{LexerError, Token};
+
+use crate::{Ast, ast::*, lexer::{LexerError, Token}};
 
 grammar;
 

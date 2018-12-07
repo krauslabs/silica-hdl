@@ -208,7 +208,7 @@ pub enum LexerError {
 #[cfg(test)]
 mod test {
 
-    use super::*;
+    use crate::lexer::*;
 
     fn assert_lex(source: &str, expected: Vec<LexerItem>) {
         let lexer = Lexer::new(source);

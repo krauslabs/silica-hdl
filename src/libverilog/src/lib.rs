@@ -5,8 +5,6 @@
 //! compilation process (such as the AST and name resolution tables) to 
 //! generate suitable output code.
 
-extern crate syntax;
-
 use syntax::ast::*;
 use syntax::visit::Visitor;
 

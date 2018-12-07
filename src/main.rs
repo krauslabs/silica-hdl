@@ -1,8 +1,4 @@
 
-extern crate clap;
-extern crate syntax;
-extern crate verilog;
-
 use std::fs::File;
 use std::io::Read;
 use std::io::Write;
