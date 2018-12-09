@@ -50,7 +50,7 @@ mod test {
 	}
 
 	fn assert_stmt(source: &str, expected: &Stmt) {
-		let module = format!("top mod a ( out y: bit ) {{ {}; }}", source);
+		let module = format!("top mod a ( out y: bit ) {{ {} }}", source);
 
 		let ast = Ast::new(&module);
 		let stmt = &ast.top.stmts[0];
@@ -61,10 +61,33 @@ mod test {
 	#[test]
 	fn assign_stmt() {
 		assert_stmt(
-			"y = 5",
+			"y = 5;",
 			&Stmt::Assign{
 				id: "y".to_string(),
 				ex: Expr::Litrl{val: "5".to_string()},
+			}
+		);
+	}
+
+	#[test]
+	fn declare_stmt() {
+		assert_stmt(
+			"let y: bit;",
+			&Stmt::Declare{
+				id: "y".to_string(),
+				ty: Type::Bit,
+			}
+		);
+	}
+
+	#[test]
+	fn declare_assign_stmt() {
+		assert_stmt(
+			"let y: bit = 1;",
+			&Stmt::DeclareAssign{
+				id: "y".to_string(),
+				ty: Type::Bit,
+				ex: Expr::Litrl{val: "1".to_string()},
 			}
 		);
 	}
