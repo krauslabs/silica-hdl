@@ -1,16 +1,15 @@
 use std::fs::File;
-use std::io::BufReader;
 use std::io::BufRead;
+use std::io::BufReader;
 use std::process::Command;
 
 #[test]
 fn expressions() {
-
     let mut expected = String::new();
     let mut generated = String::new();
 
-    let file = File::open("./tests/resources/expressions/expressions.v")
-        .expect("Input file not found.");
+    let file =
+        File::open("./tests/resources/expressions/expressions.v").expect("Input file not found.");
     let file = BufReader::new(&file);
     for line in file.lines() {
         expected.push_str(line.unwrap().trim());

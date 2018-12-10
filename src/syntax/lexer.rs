@@ -1,10 +1,8 @@
-
 use std::mem;
 use std::str::CharIndices;
 
 #[derive(Clone, Debug, PartialEq)]
 pub enum Token {
-
     // Identifiers
     Ident(String),
 
@@ -47,11 +45,14 @@ pub struct Lexer<'a> {
 }
 
 impl<'a> Lexer<'a> {
-	pub fn new(input: &str) -> Lexer {
+    pub fn new(input: &str) -> Lexer {
         let mut chars = input.char_indices();
         let lookahead = chars.next();
 
-        Lexer { chars: chars, lookahead: lookahead }
+        Lexer {
+            chars: chars,
+            lookahead: lookahead,
+        }
     }
 
     fn read_char(&mut self) -> Option<(usize, char)> {
@@ -135,9 +136,9 @@ impl<'a> Lexer<'a> {
     }
 
     fn skip_line(&mut self) {
-    	while !self.peek_char_eq('\n') {
-    		self.read_char();
-    	}
+        while !self.peek_char_eq('\n') {
+            self.read_char();
+        }
     }
 }
 
@@ -145,7 +146,6 @@ impl<'a> Iterator for Lexer<'a> {
     type Item = LexerItem;
 
     fn next(&mut self) -> Option<LexerItem> {
-
         self.skip_whitespace();
 
         if let Some((i, ch)) = self.read_char() {
@@ -162,20 +162,20 @@ impl<'a> Iterator for Lexer<'a> {
                 '&' => Some(Ok((i, Token::BitAnd, i + 1))),
                 '|' => Some(Ok((i, Token::BitOr, i + 1))),
                 '^' => Some(Ok((i, Token::BitXor, i + 1))),
-                '<' => { 
+                '<' => {
                     if self.peek_char_eq('<') {
                         self.read_char();
                         Some(Ok((i, Token::ShiftLeft, i + 2)))
                     } else {
-                        Some(Err(LexerError::InvalidCharacter{ ch: '<', pos: i }))
+                        Some(Err(LexerError::InvalidCharacter { ch: '<', pos: i }))
                     }
                 }
-                '>' => { 
+                '>' => {
                     if self.peek_char_eq('>') {
                         self.read_char();
                         Some(Ok((i, Token::ShiftRight, i + 2)))
                     } else {
-                        Some(Err(LexerError::InvalidCharacter{ ch: '>', pos: i }))
+                        Some(Err(LexerError::InvalidCharacter { ch: '>', pos: i }))
                     }
                 }
                 '/' => {
@@ -183,7 +183,7 @@ impl<'a> Iterator for Lexer<'a> {
                         self.skip_line();
                         self.next()
                     } else {
-                        Some(Err(LexerError::InvalidCharacter{ ch: '/', pos: i }))
+                        Some(Err(LexerError::InvalidCharacter { ch: '/', pos: i }))
                     }
                 }
                 ch @ _ => {
@@ -192,7 +192,7 @@ impl<'a> Iterator for Lexer<'a> {
                     } else if self.is_number(ch) {
                         Some(Ok(self.read_number(i, ch)))
                     } else {
-                        Some(Err(LexerError::InvalidCharacter{ ch: ch, pos: i }))
+                        Some(Err(LexerError::InvalidCharacter { ch: ch, pos: i }))
                     }
                 }
             }
@@ -204,7 +204,7 @@ impl<'a> Iterator for Lexer<'a> {
 
 #[derive(Debug, PartialEq)]
 pub enum LexerError {
-    InvalidCharacter{ ch: char, pos: usize },
+    InvalidCharacter { ch: char, pos: usize },
 }
 
 #[cfg(test)]
@@ -230,7 +230,7 @@ mod test {
                 Ok((7, Token::Ident("id123".to_string()), 12)),
                 Ok((13, Token::Ident("modu".to_string()), 17)),
                 Ok((18, Token::Ident("mo".to_string()), 20)),
-            ]
+            ],
         );
     }
 
@@ -241,7 +241,7 @@ mod test {
             vec![
                 Ok((0, Token::Litrl("1".to_string()), 1)),
                 Ok((2, Token::Litrl("0123".to_string()), 6)),
-            ]
+            ],
         );
     }
 
@@ -249,10 +249,7 @@ mod test {
     fn comments() {
         assert_lex(
             "top // this shouldn't be seen \n mod",
-            vec![
-                Ok((0, Token::Top, 3)),
-                Ok((32, Token::Mod, 35)),
-            ]
+            vec![Ok((0, Token::Top, 3)), Ok((32, Token::Mod, 35))],
         );
     }
 
@@ -267,7 +264,7 @@ mod test {
                 Ok((11, Token::Out, 14)),
                 Ok((15, Token::Bit, 18)),
                 Ok((19, Token::Let, 22)),
-            ]
+            ],
         );
     }
 
@@ -283,7 +280,7 @@ mod test {
                 Ok((8, Token::BitXor, 9)),
                 Ok((10, Token::ShiftLeft, 12)),
                 Ok((13, Token::ShiftRight, 15)),
-            ]
+            ],
         );
     }
 
@@ -299,20 +296,19 @@ mod test {
                 Ok((8, Token::RightParen, 9)),
                 Ok((10, Token::LeftCurlyBrace, 11)),
                 Ok((12, Token::RightCurlyBrace, 13)),
-            ]
+            ],
         );
     }
 
     #[test]
-    fn error() { 
+    fn error() {
         assert_lex(
             "= ∞ abc",
             vec![
                 Ok((0, Token::Assign, 1)),
-                Err(LexerError::InvalidCharacter{ ch: '∞', pos: 2}),
+                Err(LexerError::InvalidCharacter { ch: '∞', pos: 2 }),
                 Ok((6, Token::Ident("abc".to_string()), 9)),
-            ]
+            ],
         );
     }
 }
-
