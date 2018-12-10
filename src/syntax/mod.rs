@@ -35,7 +35,7 @@ impl Ast {
 #[cfg(test)]
 mod test {
 
-	use crate::{Ast, ast::*};
+	use crate::syntax::{Ast, ast::*};
 
 	fn assert_expr(source: &str, expected: &Expr) {
 		let module = format!("top mod a ( out y: bit ) {{ y = {}; }}", source);

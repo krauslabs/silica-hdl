@@ -6,12 +6,8 @@ edition = "2018"
 
 [dependencies]
 clap = "2.32.0"
-syntax = { path = "src/libsyntax" }
-verilog = { path = "src/libverilog" }
+lalrpop-util = "0.16.1"
+regex = "1.0.6"
 
-[workspace]
-members = [
-	"./",
-	"src/libsyntax",
-	"src/libverilog",
-]
+[build-dependencies]
+lalrpop = "0.16.1"

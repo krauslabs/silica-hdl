@@ -1,4 +1,7 @@
 
+mod syntax;
+mod verilog;
+
 use std::fs::File;
 use std::io::Read;
 use std::io::Write;
