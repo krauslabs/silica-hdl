@@ -1,7 +1,9 @@
 language: rust
 
 script:
-  - cargo test --verbose --all
+  - cargo fmt --all -- --check
+  - cargo build --verbose
+  - cargo test --verbose
 
 rust:
   - stable
