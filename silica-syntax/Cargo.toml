@@ -1,0 +1,12 @@
+[package]
+name = "syntax"
+version = "0.0.1"
+authors = ["Nick Kraus <nick@krauslabs.com>"]
+edition = "2018"
+
+[dependencies]
+lalrpop-util = "0.16.2"
+regex = "1.0.6"
+
+[build-dependencies]
+lalrpop = "0.16.2"

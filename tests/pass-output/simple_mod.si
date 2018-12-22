@@ -1,4 +1,4 @@
-top mod expressions (
+top mod simple_mod (
     in a: bit,
     in b: bit,
     in c: bit,
@@ -7,7 +7,7 @@ top mod expressions (
     out y: bit,
     out z: bit
 ) {
-	// checks all binary operators
+    // checks all binary operators
     x = a << 1 >> 1 & b ^ c | d;
 
     // checks all unary operators

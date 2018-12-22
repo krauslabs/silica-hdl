@@ -5,8 +5,8 @@
 //! compilation process (such as the AST and name resolution tables) to
 //! generate suitable output code.
 
-use crate::syntax::visit::Visitor;
-use crate::syntax::{self, ast::*};
+use syntax::visit::Visitor;
+use syntax::{self, ast::*};
 
 pub struct Verilog {
     verilog: String,
@@ -19,7 +19,7 @@ impl Verilog {
         }
     }
 
-    pub fn build(&mut self, ast: &syntax::Ast) -> String {
+    pub fn build(&mut self, ast: &Ast) -> String {
         self.visit_mod(&ast.top);
         self.verilog.clone()
     }

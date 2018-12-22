@@ -1,6 +1,8 @@
 use std::mem;
 use std::str::CharIndices;
 
+use crate::BytePos;
+
 #[derive(Clone, Debug, PartialEq)]
 pub enum Token {
     // Identifiers
@@ -36,8 +38,13 @@ pub enum Token {
     Let,
 }
 
-pub type Location = usize;
-pub type LexerItem = Result<(Location, Token, Location), LexerError>;
+#[derive(Debug, PartialEq)]
+pub struct InvalidCharacterError {
+    pub pos: BytePos,
+    pub ch: char,
+}
+
+pub type LexerItem = Result<(BytePos, Token, BytePos), InvalidCharacterError>;
 
 pub struct Lexer<'a> {
     chars: CharIndices<'a>,
@@ -167,7 +174,7 @@ impl<'a> Iterator for Lexer<'a> {
                         self.read_char();
                         Some(Ok((i, Token::ShiftLeft, i + 2)))
                     } else {
-                        Some(Err(LexerError::InvalidCharacter { ch: '<', pos: i }))
+                        Some(Err(InvalidCharacterError { pos: i, ch: '<' }))
                     }
                 }
                 '>' => {
@@ -175,7 +182,7 @@ impl<'a> Iterator for Lexer<'a> {
                         self.read_char();
                         Some(Ok((i, Token::ShiftRight, i + 2)))
                     } else {
-                        Some(Err(LexerError::InvalidCharacter { ch: '>', pos: i }))
+                        Some(Err(InvalidCharacterError { pos: i, ch: '>' }))
                     }
                 }
                 '/' => {
@@ -183,7 +190,7 @@ impl<'a> Iterator for Lexer<'a> {
                         self.skip_line();
                         self.next()
                     } else {
-                        Some(Err(LexerError::InvalidCharacter { ch: '/', pos: i }))
+                        Some(Err(InvalidCharacterError { pos: i, ch: '/' }))
                     }
                 }
                 ch @ _ => {
@@ -192,7 +199,7 @@ impl<'a> Iterator for Lexer<'a> {
                     } else if self.is_number(ch) {
                         Some(Ok(self.read_number(i, ch)))
                     } else {
-                        Some(Err(LexerError::InvalidCharacter { ch: ch, pos: i }))
+                        Some(Err(InvalidCharacterError { pos: i, ch: ch }))
                     }
                 }
             }
@@ -202,15 +209,10 @@ impl<'a> Iterator for Lexer<'a> {
     }
 }
 
-#[derive(Debug, PartialEq)]
-pub enum LexerError {
-    InvalidCharacter { ch: char, pos: usize },
-}
-
 #[cfg(test)]
 mod test {
 
-    use crate::syntax::lexer::*;
+    use crate::lexer::*;
 
     fn assert_lex(source: &str, expected: Vec<LexerItem>) {
         let lexer = Lexer::new(source);
@@ -306,7 +308,7 @@ mod test {
             "= ∞ abc",
             vec![
                 Ok((0, Token::Assign, 1)),
-                Err(LexerError::InvalidCharacter { ch: '∞', pos: 2 }),
+                Err(InvalidCharacterError { pos: 2, ch: '∞' }),
                 Ok((6, Token::Ident("abc".to_string()), 9)),
             ],
         );

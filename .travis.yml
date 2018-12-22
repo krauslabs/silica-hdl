@@ -3,8 +3,8 @@ language: rust
 script:
   - rustup component add rustfmt
   - cargo fmt --all -- --check
-  - cargo build --verbose
-  - cargo test --verbose
+  - cargo build --all --verbose
+  - cargo test --all --verbose
 
 rust:
   - stable
