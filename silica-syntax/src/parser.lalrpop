@@ -1,21 +1,21 @@
 
-use crate::syntax::{Ast, ast::*, lexer::{LexerError, Token}};
+use crate::{ast::*, BytePos, lexer::{InvalidCharacterError, Token}};
 
 grammar;
 
 pub SourceFile: Ast = {
-    "top" <module:Mod> => Ast{ top: module, },
+    "top" <top:Mod> => Ast { top },
 };
 
 Mod: Mod = {
-    "mod" <name:Ident> "(" <ports:Ports> ")" "{" <stmts:Stmt*> "}" => Mod{name, ports, stmts},
+    "mod" <name:Ident> "(" <ports:Ports> ")" "{" <stmts:Stmt*> "}" => Mod { name, ports, stmts },
 };
 
 Ports: Vec<Port> = Comma<Port>;
 
 Port: Port = {
-    "in" <name:Ident> <ty:TypeAscription> => Port{dir: Dir::Input, name, ty},
-    "out" <name:Ident> <ty:TypeAscription> => Port{dir: Dir::Output, name, ty},
+    "in" <name:Ident> <ty:TypeAscription> => Port { dir: Dir::Input, name, ty },
+    "out" <name:Ident> <ty:TypeAscription> => Port { dir: Dir::Output, name, ty },
 };
 
 TypeAscription: Type = {
@@ -29,9 +29,9 @@ Type: Type = {
 // Statements
 
 Stmt: Stmt = {
-    <id:Ident> "=" <ex:Expr> ";" => Stmt::Assign{id, ex},
-    "let" <id:Ident> <ty:TypeAscription> ";" => Stmt::Declare{id, ty},
-    "let" <id:Ident> <ty:TypeAscription> "=" <ex:Expr> ";" => Stmt::DeclareAssign{id, ty, ex},
+    <id:Ident> "=" <ex:Expr> ";" => Stmt::Assign { id, ex },
+    "let" <id:Ident> <ty:TypeAscription> ";" => Stmt::Declare { id, ty },
+    "let" <id:Ident> <ty:TypeAscription> "=" <ex:Expr> ";" => Stmt::DeclareAssign { id, ty, ex },
 };
 
 // Expressions
@@ -39,38 +39,38 @@ Stmt: Stmt = {
 Expr: Expr = ExprBitOr;
 
 ExprBitOr: Expr = {
-    <lex:ExprBitOr> "|" <rex:ExprBitXor> => Expr::Binary{lex: Box::new(lex), op: BinaryOp::BitOr, rex: Box::new(rex)},
+    <lex:ExprBitOr> "|" <rex:ExprBitXor> => Expr::Binary { lex: Box::new(lex), op: BinaryOp::BitOr, rex: Box::new(rex) },
     ExprBitXor,
 };
 
 ExprBitXor: Expr = {
-    <lex:ExprBitXor> "^" <rex:ExprBitAnd> => Expr::Binary{lex: Box::new(lex), op: BinaryOp::BitXor, rex: Box::new(rex)},
+    <lex:ExprBitXor> "^" <rex:ExprBitAnd> => Expr::Binary { lex: Box::new(lex), op: BinaryOp::BitXor, rex: Box::new(rex) },
     ExprBitAnd,
 };
 
 ExprBitAnd: Expr = {
-    <lex:ExprBitAnd> "&" <rex:ExprShift> => Expr::Binary{lex: Box::new(lex), op: BinaryOp::BitAnd, rex: Box::new(rex)},
+    <lex:ExprBitAnd> "&" <rex:ExprShift> => Expr::Binary { lex: Box::new(lex), op: BinaryOp::BitAnd, rex: Box::new(rex) },
     ExprShift,
 };
 
 ExprShift: Expr = {
-    <lex:ExprShift> "<<" <rex:ExprUnary> => Expr::Binary{lex: Box::new(lex), op: BinaryOp::ShiftLeft, rex: Box::new(rex)},
-    <lex:ExprShift> ">>" <rex:ExprUnary> => Expr::Binary{lex: Box::new(lex), op: BinaryOp::ShiftRight, rex: Box::new(rex)},
+    <lex:ExprShift> "<<" <rex:ExprUnary> => Expr::Binary { lex: Box::new(lex), op: BinaryOp::ShiftLeft, rex: Box::new(rex) },
+    <lex:ExprShift> ">>" <rex:ExprUnary> => Expr::Binary { lex: Box::new(lex), op: BinaryOp::ShiftRight, rex: Box::new(rex) },
     ExprUnary,
 };
 
 ExprUnary: Expr = {
-    "~" <ex:ExprUnary> => Expr::Unary{op: UnaryOp::Negate, ex: Box::new(ex)},
-    "&" <ex:ExprUnary> => Expr::Unary{op: UnaryOp::ReductAnd, ex: Box::new(ex)},
-    "^" <ex:ExprUnary> => Expr::Unary{op: UnaryOp::ReductXor, ex: Box::new(ex)},
-    "|" <ex:ExprUnary> => Expr::Unary{op: UnaryOp::ReductOr, ex: Box::new(ex)},
+    "~" <ex:ExprUnary> => Expr::Unary { op: UnaryOp::Negate, ex: Box::new(ex) },
+    "&" <ex:ExprUnary> => Expr::Unary { op: UnaryOp::ReductAnd, ex: Box::new(ex) },
+    "^" <ex:ExprUnary> => Expr::Unary { op: UnaryOp::ReductXor, ex: Box::new(ex) },
+    "|" <ex:ExprUnary> => Expr::Unary { op: UnaryOp::ReductOr, ex: Box::new(ex) },
     ExprTerm,
 };
 
 ExprTerm: Expr = {
-    "(" <ex:Expr> ")" => Expr::Paren{ex: Box::new(ex)},
-    <id:Ident> => Expr::Ident{id},
-    <val:Litrl> => Expr::Litrl{val},
+    "(" <ex:Expr> ")" => Expr::Paren { ex: Box::new(ex) },
+    <id:Ident> => Expr::Ident { id },
+    <val:Litrl> => Expr::Litrl { val },
 };
 
 // Other Terminals
@@ -99,8 +99,8 @@ Comma<T>: Vec<T> = {
 // Custom Lexer
 
 extern {
-    type Location = usize;
-    type Error = LexerError;
+    type Location = BytePos;
+    type Error = InvalidCharacterError;
 
     enum Token {
         // Identifiers

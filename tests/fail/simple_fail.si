@@ -1,0 +1,5 @@
+top mod simple_mod (
+    out y: bit,
+) {
+    bit;
+}

@@ -1,4 +1,9 @@
 #[derive(Clone, Debug, PartialEq)]
+pub struct Ast {
+    pub top: Mod,
+}
+
+#[derive(Clone, Debug, PartialEq)]
 pub struct Mod {
     pub name: String,
     pub ports: Vec<Port>,
