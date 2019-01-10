@@ -2,8 +2,6 @@ use std::fs::File;
 use std::io::Read;
 use std::io::Write;
 
-mod verilog;
-
 fn main() {
     let matches = clap::App::new("silicac")
         .arg(
@@ -36,7 +34,7 @@ fn main() {
         .expect("Failed to read file");
 
     let ast = syntax::parse_source(&input).expect("Failed to parse the source");
-    let verilog = verilog::Verilog::new().build(&ast);
+    let verilog = verilog::Verilog::new(&ast).build();
 
     let output_filename = matches
         .value_of("output")

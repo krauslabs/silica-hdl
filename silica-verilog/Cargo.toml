@@ -1,0 +1,8 @@
+[package]
+name = "verilog"
+version = "0.0.1"
+authors = ["Nick Kraus <nick@krauslabs.com>"]
+edition = "2018"
+
+[dependencies]
+syntax = { path = "../silica-syntax" }
