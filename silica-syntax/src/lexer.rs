@@ -19,6 +19,8 @@ pub enum Token {
     RightParen,
     LeftCurlyBrace,
     RightCurlyBrace,
+    LeftSquareBrace,
+    RightSquareBrace,
 
     // Operators
     Assign,
@@ -164,6 +166,8 @@ impl<'a> Iterator for Lexer<'a> {
                 ')' => Some(Ok((i, Token::RightParen, i + 1))),
                 '{' => Some(Ok((i, Token::LeftCurlyBrace, i + 1))),
                 '}' => Some(Ok((i, Token::RightCurlyBrace, i + 1))),
+                '[' => Some(Ok((i, Token::LeftSquareBrace, i + 1))),
+                ']' => Some(Ok((i, Token::RightSquareBrace, i + 1))),
                 '=' => Some(Ok((i, Token::Assign, i + 1))),
                 '~' => Some(Ok((i, Token::Negate, i + 1))),
                 '&' => Some(Ok((i, Token::BitAnd, i + 1))),
@@ -289,7 +293,7 @@ mod test {
     #[test]
     fn punctuation() {
         assert_lex(
-            ", ; : ( ) { }",
+            ", ; : ( ) { } [ ]",
             vec![
                 Ok((0, Token::Comma, 1)),
                 Ok((2, Token::Semicolon, 3)),
@@ -298,6 +302,8 @@ mod test {
                 Ok((8, Token::RightParen, 9)),
                 Ok((10, Token::LeftCurlyBrace, 11)),
                 Ok((12, Token::RightCurlyBrace, 13)),
+                Ok((14, Token::LeftSquareBrace, 15)),
+                Ok((16, Token::RightSquareBrace, 17)),
             ],
         );
     }
