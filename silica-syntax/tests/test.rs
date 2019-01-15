@@ -60,6 +60,20 @@ fn declare_assign_stmt() {
 }
 
 #[test]
+fn vector_declare_stmt() {
+    assert_stmt(
+        "let y: bit[3:0] = 1;",
+        &Stmt::DeclareAssign {
+            id: "y".to_string(),
+            ty: Type::BitVec { high: 3, low: 0 },
+            ex: Expr::Litrl {
+                val: "1".to_string(),
+            },
+        },
+    );
+}
+
+#[test]
 fn precedence() {
     assert_expr(
         "1 | 2 ^ 3 & & 4 << 5",

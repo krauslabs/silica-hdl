@@ -18,13 +18,27 @@ Port: Port = {
     "out" <name:Ident> <ty:TypeAscription> => Port { dir: Dir::Output, name, ty },
 };
 
+// Types
+
 TypeAscription: Type = {
     ":" <ty:Type> => ty,
 }
 
 Type: Type = {
-    "bit" => Type::Bit,
+    TypeBit,
 };
+
+TypeBit: Type = {
+    "bit" => Type::Bit,
+    TypeBitVec,
+}
+
+TypeBitVec: Type = {
+    "bit" "[" <high:Litrl> ":" <low:Litrl> "]" => Type::BitVec {
+        high: high.parse().unwrap(),
+        low: low.parse().unwrap(),
+    },
+}
 
 // Statements
 

@@ -26,6 +26,7 @@ pub enum Dir {
 #[derive(Clone, Debug, PartialEq)]
 pub enum Type {
     Bit,
+    BitVec { high: i32, low: i32 },
 }
 
 #[derive(Clone, Debug, PartialEq)]
